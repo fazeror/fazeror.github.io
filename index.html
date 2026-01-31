@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ Luxe App | Telegram Mini App</title>
+    <script src="https://telegram.org/js/tma.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Цветовая палитра в стиле "тёмный неон" */
+            --bg-primary: #0f0b1f;
+            --bg-secondary: #1a1635;
+            --bg-card: rgba(255, 255, 255, 0.05);
+            --accent-primary: #7c4dff;
+            --accent-secondary: #00e5ff;
+            --accent-gradient: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0d0;
+            --success: #00d68f;
+            --warning: #ffaa00;
+            --danger: #ff3d71;
+            --border-radius: 20px;
+            --border-radius-sm: 12px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        /* Контейнер приложения */
+        .app-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Фон с градиентными частицами */
+        .bg-particle {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            opacity: 0.1;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-20px) translateX(10px); }
+        }
+
+        /* Шапка */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0 30px;
+            position: relative;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: var(--shadow);
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            border: 2px solid var(--accent-primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--accent-primary);
+        }
+
+        /* Основной контент */
+        .main-content {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Карточки */
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+            border-color: rgba(124, 77, 255, 0.3);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-gradient);
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .card-icon {
+            color: var(--accent-primary);
+            font-size: 20px;
+        }
+
+        /* Кнопки */
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px 24px;
+            border-radius: var(--border-radius-sm);
+            border: none;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin: 10px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: white;
+            box-shadow: 0 5px 15px rgba(124, 77, 255, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(124, 77, 255, 0.6);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-primary);
+        }
+
+        /* Прогресс бар */
+        .progress-container {
+            margin: 25px 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: var(--bg-secondary);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-gradient);
+            border-radius: 5px;
+            width: 65%;
+            transition: width 1s ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Список элементов */
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .list-item:hover {
+            background: rgba(124, 77, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .item-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-primary);
+        }
+
+        .item-text h4 {
+            font-size: 15px;
+            margin-bottom: 3px;
+        }
+
+        .item-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .item-value {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--accent-secondary);
+        }
+
+        /* Нижнее меню */
+        .bottom-nav {
+            position: sticky;
+            bottom: 20px;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 15px;
+            border-radius: var(--border-radius-sm);
+            color: var(--text-secondary);
+            transition: var(--transition);
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+        }
+
+        .nav-item.active {
+            color: var(--accent-primary);
+            background: rgba(124, 77, 255, 0.1);
+        }
+
+        .nav-item:hover {
+            color: var(--accent-primary);
+            transform: translateY(-3px);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .nav-text {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Утилиты */
+        .mt-20 { margin-top: 20px; }
+        .mb-20 { margin-bottom: 20px; }
+        .text-center { text-align: center; }
+        .text-gradient {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 480px) {
+            .app-container { padding: 15px; }
+            .card { padding: 20px; }
+            .btn { padding: 14px 20px; }
+        }
+
+        /* Анимация появления */
+        [data-animate] {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s, transform 0.6s;
+        }
+
+        [data-animate].animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Фон с частицами -->
+    <div class="bg-particle" id="particles"></div>
+
+    <!-- Основной контейнер -->
+    <div class="app-container">
+        <!-- Шапка -->
+        <header class="app-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-sparkles"></i>
+                </div>
+                <div class="logo-text">LuxeApp</div>
+            </div>
+            <div class="user-avatar" id="userAvatar">
+                <i class="fas fa-user"></i>
+            </div>
+        </header>
+
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Карточка приветствия -->
+            <section class="card" data-animate>
+                <div class="card-title">
+                    <i class="fas fa-gem card-icon"></i>
+                    <h2>Добро пожаловать!</h2>
+                </div>
+                <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;">
+                    Это ваше пространство для достижения целей. Начните свой путь к успеху вместе с нами.
+                </p>
+                
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>Ваш прогресс</span>
+                        <span id="progressValue">65%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="mainActionBtn">
+                    <i class="fas fa-rocket"></i>
+                    <span>Начать сейчас</span>
+                </button>
+            </section>
+
+            <!-- Карточка статистики -->
+            <section class="card" data-animate>
+                <div class="card-title">
+                    <i class="fas fa-chart-line card-icon"></i>
+                    <h2>Ваша активность</h2>
+                </div>
+                
+                <div class="item-list">
+                    <div class="list-item">
+                        <div class="item-info">
+                            <div class="item-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="item-text">
+                                <h4>Текущая серия</h4>
+                                <p>12 дней подряд</p>
+                            </div>
+                        </div>
+                        <div class="item-value">🔥</div>
+                    </div>
+                    
+                    <div class="list-item">
+                        <div class="item-info">
+                            <div class="item-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="item-text">
+                                <h4>Достижения</h4>
+                                <p>8 из 15 завершено</p>
+                            </div>
+                        </div>
+                        <div class="item-value">🏆</div>
+                    </div>
+                    
+                    <div class="list-item">
+                        <div class="item-info">
+                            <div class="item-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="item-text">
+                                <h4>Время фокуса</h4>
+                                <p>45 часов в этом месяце</p>
+                            </div>
+                        </div>
+                        <div class="item-value">⏱️</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Карточка действий -->
+            <section class="card" data-animate>
+                <div class="card-title">
+                    <i class="fas fa-bolt card-icon"></i>
+                    <h2>Быстрые действия</h2>
+                </div>
+                
+                <button class="btn btn-secondary" id="action1">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Добавить задачу</span>
+                </button>
+                
+                <button class="btn btn-secondary" id="action2">
+                    <i class="fas fa-share-alt"></i>
+                    <span>Поделиться прогрессом</span>
+                </button>
+                
+                <button class="btn btn-secondary" id="action3">
+                    <i class="fas fa-cog"></i>
+                    <span>Настройки</span>
+                </button>
+            </section>
+        </main>
+
+        <!-- Нижнее меню -->
+        <nav class="bottom-nav">
+            <div class="nav-item active">
+                <i class="fas fa-home nav-icon"></i>
+                <span class="nav-text">Главная</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-chart-bar nav-icon"></i>
+                <span class="nav-text">Статистика</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-bell nav-icon"></i>
+                <span class="nav-text">Уведомления</span>
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-user-circle nav-icon"></i>
+                <span class="nav-text">Профиль</span>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        // Инициализация Telegram Mini Apps
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.enableClosingConfirmation();
+        
+        // Устанавливаем тему Telegram
+        if (tg.colorScheme === 'dark') {
+            document.documentElement.style.setProperty('--bg-primary', '#0f0b1f');
+        } else {
+            document.documentElement.style.setProperty('--bg-primary', '#f8f9ff');
+            document.documentElement.style.setProperty('--text-primary', '#1a1a2e');
+            document.documentElement.style.setProperty('--text-secondary', '#5a5a7a');
+        }
+        
+        // Устанавливаем данные пользователя
+        const user = tg.initDataUnsafe?.user;
+        if (user) {
+            const avatar = document.getElementById('userAvatar');
+            if (user.first_name) {
+                avatar.innerHTML = `<i class="fas fa-user"></i>`;
+                avatar.title = `${user.first_name} ${user.last_name || ''}`;
+            }
+        }
+        
+        // Создание фона с частицами
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                const size = Math.random() * 60 + 20;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+                particle.style.opacity = Math.random() * 0.1 + 0.05;
+                container.appendChild(particle);
+            }
+        }
+        
+        // Анимация при скролле
+        function animateOnScroll() {
+            const elements = document.querySelectorAll('[data-animate]');
+            elements.forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 50) {
+                    el.classList.add('animated');
+                }
+            });
+        }
+        
+        // Обработчики кнопок
+        document.getElementById('mainActionBtn').addEventListener('click', function() {
+            tg.HapticFeedback.impactOccurred('medium');
+            tg.showAlert('Отличный выбор! Вы начинаете свой путь к успеху.');
+            
+            // Анимация прогресса
+            const progressFill = document.getElementById('progressFill');
+            const progressValue = document.getElementById('progressValue');
+            let progress = 65;
+            
+            const interval = setInterval(() => {
+                progress += 1;
+                progressFill.style.width = `${progress}%`;
+                progressValue.textContent = `${progress}%`;
+                
+                if (progress >= 80) {
+                    clearInterval(interval);
+                }
+            }, 50);
+        });
+        
+        // Навигация
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                tg.HapticFeedback.selectionChanged();
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Быстрые действия
+        document.getElementById('action1').addEventListener('click', () => {
+            tg.HapticFeedback.impactOccurred('light');
+            tg.showPopup({
+                title: 'Новая задача',
+                message: 'Что вы планируете сделать?',
+                buttons: [
+                    {id: 'add', text: 'Добавить', type: 'default'},
+                    {id: 'cancel', text: 'Отмена', type: 'cancel'}
+                ]
+            }, (buttonId) => {
+                if (buttonId === 'add') {
+                    tg.showAlert('Задача добавлена!');
+                }
+            });
+        });
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            animateOnScroll();
+            window.addEventListener('scroll', animateOnScroll);
+            
+            // Запуск начальных анимаций
+            setTimeout(() => {
+                document.querySelectorAll('[data-animate]').forEach(el => {
+                    el.classList.add('animated');
+                });
+            }, 300);
+        });
+        
+        // Отправка данных в Telegram
+        function sendDataToTelegram(data) {
+            tg.sendData(JSON.stringify(data));
+        }
+        
+        // Пример отправки данных
+        document.getElementById('action2').addEventListener('click', () => {
+            const data = {
+                action: 'share_progress',
+                progress: 65,
+                timestamp: new Date().toISOString()
+            };
+            sendDataToTelegram(data);
+            tg.showAlert('Прогресс отправлен!');
+        });
+    </script>
+</body>
+</html>
