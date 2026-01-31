@@ -9,7 +9,7 @@
     <style>
         :root {
             --bg-space: #0a0e17;
-            --bg-card: rgba(16, 23, 41, 0.8);
+            --bg-card: rgba(16, 23, 41, 0.95);
             --primary: #6c5ce7;
             --secondary: #00cec9;
             --accent: #fd79a8;
@@ -27,6 +27,7 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
 
@@ -39,6 +40,7 @@
             background-image: 
                 radial-gradient(circle at 20% 30%, rgba(108, 92, 231, 0.15) 0%, transparent 20%),
                 radial-gradient(circle at 80% 70%, rgba(0, 206, 201, 0.1) 0%, transparent 20%);
+            touch-action: manipulation;
         }
 
         /* Контейнер */
@@ -58,6 +60,7 @@
             width: 100%;
             height: 100%;
             z-index: -1;
+            pointer-events: none;
         }
 
         .star {
@@ -65,6 +68,7 @@
             background: white;
             border-radius: 50%;
             animation: twinkle 3s infinite alternate;
+            pointer-events: none;
         }
 
         @keyframes twinkle {
@@ -174,7 +178,7 @@
             font-weight: 600;
         }
 
-        /* Главная кнопка кликера */
+        /* Главная кнопка кликера - ИЗМЕНЕНО */
         .clicker-area {
             background: var(--bg-card);
             border-radius: var(--radius);
@@ -188,11 +192,9 @@
             position: relative;
             overflow: hidden;
             cursor: pointer;
-            transition: transform 0.1s;
-        }
-
-        .clicker-area:active {
-            transform: scale(0.98);
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: manipulation;
         }
 
         .clicker-button {
@@ -210,9 +212,10 @@
             transition: all 0.1s;
             position: relative;
             margin-bottom: 25px;
+            touch-action: manipulation;
         }
 
-        .clicker-button:active {
+        .clicker-button.active {
             transform: scale(0.95);
             box-shadow: 
                 0 0 40px rgba(108, 92, 231, 0.7),
@@ -249,6 +252,7 @@
             animation: floatUp 1s forwards;
             font-size: 24px;
             text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            z-index: 1000;
         }
 
         @keyframes floatUp {
@@ -292,16 +296,13 @@
             transition: all 0.3s;
             border: 1px solid transparent;
             cursor: pointer;
-        }
-
-        .upgrade-item:hover {
-            background: rgba(108, 92, 231, 0.1);
-            border-color: var(--primary);
-            transform: translateX(5px);
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .upgrade-item:active {
-            transform: translateX(5px) scale(0.98);
+            transform: scale(0.98);
+            background: rgba(108, 92, 231, 0.15);
         }
 
         .upgrade-info {
@@ -368,6 +369,13 @@
             border-radius: var(--radius-sm);
             margin-bottom: 10px;
             border-left: 4px solid var(--secondary);
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .autoclicker-item:active {
+            transform: scale(0.98);
+            background: rgba(0, 206, 201, 0.1);
         }
 
         .autoclicker-icon {
@@ -431,8 +439,15 @@
         @media (max-width: 480px) {
             .container { padding: 15px; }
             .currency-amount { font-size: 44px; }
-            .clicker-button { width: 160px; height: 160px; }
-            .clicker-button::after { width: 180px; height: 180px; }
+            .clicker-button { 
+                width: 160px; 
+                height: 160px; 
+                font-size: 42px;
+            }
+            .clicker-button::after { 
+                width: 180px; 
+                height: 180px; 
+            }
         }
 
         /* Прогресс-бар */
@@ -470,9 +485,48 @@
             0% { transform: translateX(-100%); }
             100% { transform: translateX(100%); }
         }
+
+        /* Сообщение о загрузке */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-space);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            transition: opacity 0.5s;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader {
+            width: 80px;
+            height: 80px;
+            border: 4px solid transparent;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
+    <!-- Экран загрузки -->
+    <div class="loading" id="loading">
+        <div class="loader"></div>
+    </div>
+
     <!-- Звёздный фон -->
     <div class="stars" id="stars"></div>
 
@@ -506,13 +560,13 @@
         </div>
 
         <!-- Главный кликер -->
-        <div class="clicker-area" id="clicker">
-            <div class="clicker-button">
+        <div class="clicker-area" id="clickerArea">
+            <div class="clicker-button" id="clickerButton">
                 <i class="fas fa-gem"></i>
             </div>
             <div class="clicker-label">НАЖМИ СИЛЬНЕЕ!</div>
             <div class="clicker-stats">
-                <div style="margin-top: 15px; display: flex; gap: 20px;">
+                <div style="margin-top: 15px; display: flex; gap: 20px; justify-content: center;">
                     <div style="text-align: center;">
                         <div style="color: var(--text-dim); font-size: 12px;">За клик</div>
                         <div style="color: var(--gold); font-weight: 800;" id="clickPower">1</div>
@@ -588,7 +642,7 @@
                 <span>АВТОКЛИКЕРЫ</span>
             </div>
             
-            <div class="autoclicker-item">
+            <div class="autoclicker-item" id="autoclickerItem1">
                 <div class="autoclicker-icon">
                     <i class="fas fa-satellite"></i>
                 </div>
@@ -599,7 +653,7 @@
                 <div class="autoclicker-count" id="autoclicker1">0</div>
             </div>
             
-            <div class="autoclicker-item">
+            <div class="autoclicker-item" id="autoclickerItem2">
                 <div class="autoclicker-icon">
                     <i class="fas fa-rocket"></i>
                 </div>
@@ -610,7 +664,7 @@
                 <div class="autoclicker-count" id="autoclicker2">0</div>
             </div>
             
-            <div class="autoclicker-item">
+            <div class="autoclicker-item" id="autoclickerItem3">
                 <div class="autoclicker-icon">
                     <i class="fas fa-user-astronaut"></i>
                 </div>
@@ -626,8 +680,12 @@
     <script>
         // Инициализация Telegram Web App
         const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.enableClosingConfirmation();
+        
+        // Инициализируем только если Telegram Web App доступен
+        if (tg && tg.initData) {
+            tg.expand();
+            tg.enableClosingConfirmation();
+        }
         
         // Игровые переменные
         let currency = 0;
@@ -637,6 +695,7 @@
         let level = 1;
         let xp = 0;
         let xpToNextLevel = 100;
+        let isInitialized = false;
         
         // Улучшения
         const upgrades = {
@@ -655,6 +714,7 @@
         // Создание звёздного фона
         function createStars() {
             const starsContainer = document.getElementById('stars');
+            starsContainer.innerHTML = '';
             for (let i = 0; i < 80; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
@@ -704,18 +764,25 @@
             document.getElementById('xpToNext').textContent = formatNumber(xpToNextLevel - xp);
             
             // Обновление стоимости улучшений
-            document.querySelectorAll('.upgrade-item').forEach(item => {
+            document.querySelectorAll('.upgrade-item').forEach((item, index) => {
                 const costEl = item.querySelector('.cost');
-                const cost = parseInt(costEl.dataset.cost);
+                let cost;
+                if (index === 0) cost = upgrades.power.cost;
+                else if (index === 1) cost = upgrades.speed.cost;
+                else if (index === 2) cost = upgrades.critical.cost;
+                
                 costEl.textContent = formatNumber(cost);
+                costEl.dataset.cost = cost;
                 
                 // Проверка, можем ли купить
                 if (currency >= cost) {
                     item.style.opacity = '1';
                     item.style.cursor = 'pointer';
+                    item.style.pointerEvents = 'auto';
                 } else {
                     item.style.opacity = '0.6';
                     item.style.cursor = 'not-allowed';
+                    item.style.pointerEvents = 'none';
                 }
             });
             
@@ -725,14 +792,28 @@
             document.getElementById('autoclicker3').textContent = autoclickers[2].count;
         }
         
-        // Клик по основной кнопке
+        // Обработчик клика по основной кнопке
         function handleClick(event) {
+            if (!isInitialized) return;
+            
+            // Предотвращаем поведение по умолчанию
+            event.preventDefault();
+            event.stopPropagation();
+            
             // Вибрация
-            tg.HapticFeedback.impactOccurred('light');
+            if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
+            }
+            
+            // Анимация кнопки
+            const button = document.getElementById('clickerButton');
+            button.classList.add('active');
+            setTimeout(() => button.classList.remove('active'), 100);
             
             // Позиция для анимации
-            const x = event.clientX;
-            const y = event.clientY;
+            const rect = button.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
             
             // Случайный критический удар
             let isCritical = false;
@@ -768,6 +849,8 @@
             
             // Сохраняем прогресс
             saveGame();
+            
+            return false;
         }
         
         // Анимация клика
@@ -787,18 +870,24 @@
             document.body.appendChild(clickValue);
             
             setTimeout(() => {
-                clickValue.remove();
+                if (clickValue.parentNode) {
+                    clickValue.parentNode.removeChild(clickValue);
+                }
             }, 1000);
         }
         
         // Покупка улучшения
         function buyUpgrade(upgradeId) {
+            if (!isInitialized) return;
+            
             const upgrade = upgrades[upgradeId];
             const cost = upgrade.cost;
             
             if (currency >= cost) {
                 // Вибрация
-                tg.HapticFeedback.impactOccurred('medium');
+                if (tg && tg.HapticFeedback) {
+                    tg.HapticFeedback.impactOccurred('medium');
+                }
                 
                 // Покупка
                 currency -= cost;
@@ -821,18 +910,24 @@
                 updateUI();
                 saveGame();
             } else {
-                tg.HapticFeedback.notificationOccurred('error');
+                if (tg && tg.HapticFeedback) {
+                    tg.HapticFeedback.notificationOccurred('error');
+                }
             }
         }
         
         // Покупка автокликера
         function buyAutoclicker(index) {
+            if (!isInitialized) return;
+            
             const clicker = autoclickers[index];
             const cost = clicker.baseCost * Math.pow(1.5, clicker.count);
             
             if (currency >= cost) {
                 // Вибрация
-                tg.HapticFeedback.impactOccurred('soft');
+                if (tg && tg.HapticFeedback) {
+                    tg.HapticFeedback.impactOccurred('soft');
+                }
                 
                 // Покупка
                 currency -= cost;
@@ -852,6 +947,8 @@
         
         // Автоматический доход
         function autoIncome() {
+            if (!isInitialized) return;
+            
             autoclickers.forEach(clicker => {
                 if (clicker.count > 0) {
                     const earned = clicker.count * clicker.income;
@@ -860,12 +957,12 @@
                     
                     // Иногда показываем авто-клики
                     if (Math.random() < 0.1) {
-                        createClickAnimation(
-                            Math.random() * window.innerWidth,
-                            Math.random() * window.innerHeight,
-                            earned,
-                            false
-                        );
+                        const button = document.getElementById('clickerButton');
+                        const rect = button.getBoundingClientRect();
+                        const x = rect.left + rect.width / 2;
+                        const y = rect.top + rect.height / 2;
+                        
+                        createClickAnimation(x, y, earned, false);
                     }
                 }
             });
@@ -886,7 +983,9 @@
                 clickPower += level * 0.5;
                 
                 // Вибрация
-                tg.HapticFeedback.notificationOccurred('success');
+                if (tg && tg.HapticFeedback) {
+                    tg.HapticFeedback.notificationOccurred('success');
+                }
                 
                 // Показываем уведомление
                 showBonus(`УРОВЕНЬ ${level}!`, '#ffd700');
@@ -909,7 +1008,9 @@
             document.body.appendChild(bonus);
             
             setTimeout(() => {
-                bonus.remove();
+                if (bonus.parentNode) {
+                    bonus.parentNode.removeChild(bonus);
+                }
             }, 3000);
         }
         
@@ -930,7 +1031,7 @@
             localStorage.setItem('cosmicClickerSave', JSON.stringify(gameData));
             
             // Отправляем в Telegram
-            if (tg.sendData) {
+            if (tg && tg.sendData) {
                 tg.sendData(JSON.stringify({
                     action: 'save',
                     level: level,
@@ -943,55 +1044,133 @@
         function loadGame() {
             const saved = localStorage.getItem('cosmicClickerSave');
             if (saved) {
-                const gameData = JSON.parse(saved);
-                
-                currency = gameData.currency || 0;
-                clickPower = gameData.clickPower || 1;
-                totalClicks = gameData.totalClicks || 0;
-                incomePerSecond = gameData.incomePerSecond || 0;
-                level = gameData.level || 1;
-                xp = gameData.xp || 0;
-                xpToNextLevel = gameData.xpToNextLevel || 100;
-                
-                if (gameData.upgrades) {
-                    Object.assign(upgrades, gameData.upgrades);
-                }
-                
-                if (gameData.autoclickers) {
-                    autoclickers.forEach((clicker, index) => {
-                        if (gameData.autoclickers[index]) {
-                            clicker.count = gameData.autoclickers[index].count || 0;
-                        }
+                try {
+                    const gameData = JSON.parse(saved);
+                    
+                    currency = gameData.currency || 0;
+                    clickPower = gameData.clickPower || 1;
+                    totalClicks = gameData.totalClicks || 0;
+                    incomePerSecond = gameData.incomePerSecond || 0;
+                    level = gameData.level || 1;
+                    xp = gameData.xp || 0;
+                    xpToNextLevel = gameData.xpToNextLevel || 100;
+                    
+                    if (gameData.upgrades) {
+                        Object.assign(upgrades, gameData.upgrades);
+                    }
+                    
+                    if (gameData.autoclickers) {
+                        autoclickers.forEach((clicker, index) => {
+                            if (gameData.autoclickers[index]) {
+                                clicker.count = gameData.autoclickers[index].count || 0;
+                                clicker.baseCost = gameData.autoclickers[index].baseCost || clicker.baseCost;
+                                clicker.income = gameData.autoclickers[index].income || clicker.income;
+                            }
+                        });
+                    }
+                    
+                    // Пересчитываем доход в секунду
+                    incomePerSecond = 0;
+                    autoclickers.forEach(clicker => {
+                        incomePerSecond += clicker.count * clicker.income;
                     });
+                    
+                    showBonus('ИГРА ЗАГРУЖЕНА!', '#00cec9');
+                } catch (e) {
+                    console.error('Ошибка загрузки игры:', e);
                 }
-                
-                showBonus('ИГРА ЗАГРУЖЕНА!', '#00cec9');
             }
         }
         
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', function() {
+        // Инициализация игры
+        function initGame() {
             // Создаём звёзды
             createStars();
             
             // Загружаем игру
             loadGame();
             
-            // Кликер
-            document.getElementById('clicker').addEventListener('click', handleClick);
+            // Вешаем обработчики на основную кнопку
+            const clickerArea = document.getElementById('clickerArea');
+            const clickerButton = document.getElementById('clickerButton');
+            
+            // Обработчики для мобильных устройств
+            clickerArea.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                handleClick(e);
+            }, { passive: false });
+            
+            clickerArea.addEventListener('touchend', function(e) {
+                e.preventDefault();
+            }, { passive: false });
+            
+            clickerButton.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                handleClick(e);
+            }, { passive: false });
+            
+            clickerButton.addEventListener('touchend', function(e) {
+                e.preventDefault();
+            }, { passive: false });
+            
+            // Обработчики для десктопа
+            clickerArea.addEventListener('mousedown', handleClick);
+            clickerButton.addEventListener('mousedown', handleClick);
+            
+            // Предотвращаем контекстное меню на кнопке
+            clickerArea.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
             
             // Улучшения
-            document.getElementById('upgrade1').addEventListener('click', () => buyUpgrade('power'));
-            document.getElementById('upgrade2').addEventListener('click', () => buyUpgrade('speed'));
-            document.getElementById('upgrade3').addEventListener('click', () => buyUpgrade('critical'));
+            document.getElementById('upgrade1').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                buyUpgrade('power');
+            });
             
-            // Автокликеры (тап для покупки)
-            document.getElementById('autoclicker1').parentElement.addEventListener('click', () => buyAutoclicker(0));
-            document.getElementById('autoclicker2').parentElement.addEventListener('click', () => buyAutoclicker(1));
-            document.getElementById('autoclicker3').parentElement.addEventListener('click', () => buyAutoclicker(2));
+            document.getElementById('upgrade2').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                buyUpgrade('speed');
+            });
+            
+            document.getElementById('upgrade3').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                buyUpgrade('critical');
+            });
+            
+            // Автокликеры
+            document.getElementById('autoclickerItem1').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                buyAutoclicker(0);
+            });
+            
+            document.getElementById('autoclickerItem2').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                buyAutoclicker(1);
+            });
+            
+            document.getElementById('autoclickerItem3').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                buyAutoclicker(2);
+            });
             
             // Обновляем интерфейс
             updateUI();
+            
+            // Инициализируем автодоход
+            isInitialized = true;
+            
+            // Скрываем экран загрузки
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+            }, 500);
             
             // Автоматический доход каждую секунду
             setInterval(autoIncome, 1000);
@@ -1001,10 +1180,33 @@
             
             // Первоначальное сохранение
             saveGame();
-        });
+        }
+        
+        // Запускаем игру после загрузки страницы
+        document.addEventListener('DOMContentLoaded', initGame);
         
         // Отправка данных в Telegram при закрытии
         window.addEventListener('beforeunload', saveGame);
+        
+        // Предотвращаем масштабирование при двойном тапе
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+        
+        // Предотвращаем скролл при тапе на кнопку
+        document.addEventListener('touchmove', function(e) {
+            if (e.target.closest('.clicker-area') || 
+                e.target.closest('.clicker-button') ||
+                e.target.closest('.upgrade-item') ||
+                e.target.closest('.autoclicker-item')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
     </script>
 </body>
 </html>
