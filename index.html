@@ -62,7 +62,7 @@
         /* Шапка */
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             padding: 20px;
             background: rgba(26, 26, 26, 0.8);
             backdrop-filter: blur(10px);
@@ -107,7 +107,86 @@
         .subtitle {
             color: var(--text-secondary);
             font-size: 1rem;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+        }
+
+        /* Кнопка клика - НА ВЕРХУ */
+        .click-area-main {
+            margin: 20px 0 30px 0;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .click-button-main {
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle at center, 
+                rgba(68, 136, 255, 0.2) 0%, 
+                rgba(26, 26, 26, 0.9) 70%);
+            border-radius: 50%;
+            border: 4px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            box-shadow: 
+                0 0 80px rgba(0, 200, 255, 0.3),
+                inset 0 0 50px rgba(255, 255, 255, 0.1);
+        }
+
+        .click-button-main:active {
+            transform: scale(0.92);
+            box-shadow: 
+                0 0 120px rgba(0, 200, 255, 0.5),
+                inset 0 0 70px rgba(255, 255, 255, 0.2);
+        }
+
+        .click-button-main.panic {
+            animation: panicPulse 0.5s infinite;
+            border-color: var(--accent-red) !important;
+        }
+
+        @keyframes panicPulse {
+            0%, 100% { 
+                box-shadow: 
+                    0 0 80px rgba(255, 68, 68, 0.4),
+                    inset 0 0 50px rgba(255, 255, 255, 0.1);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 120px rgba(255, 68, 68, 0.8),
+                    inset 0 0 70px rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        .click-icon-main {
+            font-size: 3.5rem;
+            transition: transform 0.3s;
+        }
+
+        .click-button-main:hover .click-icon-main {
+            transform: scale(1.1);
+        }
+
+        .click-label {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .click-description {
+            margin-top: 10px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            min-height: 20px;
+            padding: 5px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.2);
         }
 
         /* Шумометр */
@@ -177,6 +256,7 @@
             transition: all 0.3s;
             opacity: 0;
             transform: translateY(-10px);
+            background: rgba(0, 0, 0, 0.3);
         }
 
         .noise-warning.show {
@@ -184,7 +264,7 @@
             transform: translateY(0);
         }
 
-        /* Ресурсы */
+        /* Ресурсы - ПОД кнопкой */
         .resources-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -227,64 +307,6 @@
             background: linear-gradient(45deg, #fff, var(--accent-blue));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-        }
-
-        /* Кнопка клика */
-        .click-area {
-            margin: 40px 0;
-            text-align: center;
-        }
-
-        .click-button {
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle at center, 
-                var(--bg-card) 0%, 
-                var(--bg-secondary) 100%);
-            border-radius: 50%;
-            border: 4px solid transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-            box-shadow: 
-                0 0 60px rgba(0, 200, 255, 0.2),
-                inset 0 0 40px rgba(255, 255, 255, 0.1);
-        }
-
-        .click-button:active {
-            transform: scale(0.95);
-            box-shadow: 
-                0 0 100px rgba(0, 200, 255, 0.4),
-                inset 0 0 60px rgba(255, 255, 255, 0.2);
-        }
-
-        .click-button.panic {
-            animation: panicPulse 0.5s infinite;
-            border-color: var(--accent-red) !important;
-        }
-
-        @keyframes panicPulse {
-            0%, 100% { box-shadow: 0 0 60px rgba(255, 68, 68, 0.4); }
-            50% { box-shadow: 0 0 100px rgba(255, 68, 68, 0.8); }
-        }
-
-        .click-icon {
-            font-size: 4rem;
-            transition: transform 0.3s;
-        }
-
-        .click-button:hover .click-icon {
-            transform: scale(1.1);
-        }
-
-        .click-label {
-            margin-top: 20px;
-            font-size: 1.2rem;
-            color: var(--text-secondary);
         }
 
         /* Улучшения */
@@ -439,6 +461,7 @@
             position: absolute;
             pointer-events: none;
             opacity: 0;
+            z-index: 100;
         }
 
         .float-up {
@@ -457,13 +480,13 @@
         }
 
         .shake {
-            animation: shake 0.5s;
+            animation: shake 0.3s;
         }
 
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+            20%, 40%, 60%, 80% { transform: translateX(3px); }
         }
 
         /* Уведомления */
@@ -542,8 +565,12 @@
         .tabs {
             display: flex;
             gap: 10px;
-            margin-bottom: 30px;
+            margin: 30px 0;
             flex-wrap: wrap;
+            background: rgba(26, 26, 26, 0.8);
+            padding: 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .tab {
@@ -554,6 +581,9 @@
             transition: all 0.3s;
             font-weight: 500;
             border: 2px solid transparent;
+            flex: 1;
+            text-align: center;
+            min-width: 120px;
         }
 
         .tab:hover {
@@ -572,8 +602,8 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .tab-content.active {
@@ -581,39 +611,33 @@
         }
 
         /* Прогресс дня */
-        .day-progress {
+        .day-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .day-box, .survivors-box {
+            text-align: center;
             background: rgba(0, 0, 0, 0.3);
-            height: 10px;
-            border-radius: 5px;
-            margin: 20px 0;
-            overflow: hidden;
+            padding: 15px;
+            border-radius: 15px;
+            flex: 1;
+            margin: 0 5px;
         }
 
-        .day-progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
-            width: 0%;
-            transition: width 1s ease;
-            position: relative;
+        .day-label, .survivors-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
         }
 
-        .day-progress-bar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg,
-                transparent 0%,
-                rgba(255, 255, 255, 0.3) 50%,
-                transparent 100%);
-            animation: progressShine 2s infinite;
-        }
-
-        @keyframes progressShine {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        .day-value, .survivors-value {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         /* Мобильная адаптация */
@@ -622,13 +646,17 @@
                 padding: 10px;
             }
             
-            .resources-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .click-button {
+            .click-button-main {
                 width: 150px;
                 height: 150px;
+            }
+            
+            .click-icon-main {
+                font-size: 3rem;
+            }
+            
+            .resources-grid {
+                grid-template-columns: 1fr;
             }
             
             .upgrades-grid {
@@ -636,13 +664,77 @@
             }
             
             .tabs {
-                justify-content: center;
+                flex-direction: column;
             }
             
             .tab {
-                padding: 10px 20px;
-                font-size: 0.9rem;
+                width: 100%;
+                min-width: auto;
             }
+            
+            .day-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .day-box, .survivors-box {
+                margin: 0;
+            }
+        }
+
+        /* Клик-уведомление */
+        .click-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px 30px;
+            border-radius: 15px;
+            border: 2px solid var(--accent-green);
+            box-shadow: 0 0 50px rgba(0, 255, 136, 0.5);
+            z-index: 1500;
+            text-align: center;
+            display: none;
+            animation: clickNotify 1s ease-out;
+        }
+
+        @keyframes clickNotify {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .click-reward-item {
+            display: inline-flex;
+            align-items: center;
+            margin: 0 5px;
+            font-size: 1.5rem;
+            animation: rewardFloat 0.5s ease-out;
+        }
+
+        @keyframes rewardFloat {
+            0% { transform: translateY(0); opacity: 0; }
+            100% { transform: translateY(-20px); opacity: 1; }
+        }
+
+        /* Эффект свечения кнопки */
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 80px rgba(0, 200, 255, 0.3); }
+            50% { box-shadow: 0 0 100px rgba(0, 200, 255, 0.5); }
+        }
+
+        .click-button-main.glow {
+            animation: glow 2s infinite;
         }
     </style>
 </head>
@@ -654,16 +746,25 @@
             <p class="subtitle">Постапокалиптический кликер выживания</p>
             
             <div class="day-info">
-                <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-                    <div>
-                        <div style="font-size: 0.9rem; color: var(--text-secondary);">День</div>
-                        <div id="day" style="font-size: 2rem; font-weight: bold;">1</div>
-                    </div>
-                    <div>
-                        <div style="font-size: 0.9rem; color: var(--text-secondary);">Выжившие</div>
-                        <div id="survivors" style="font-size: 2rem; font-weight: bold;">1</div>
-                    </div>
+                <div class="day-box">
+                    <div class="day-label">День</div>
+                    <div id="day" class="day-value">1</div>
                 </div>
+                <div class="survivors-box">
+                    <div class="survivors-label">Выжившие</div>
+                    <div id="survivors" class="survivors-value">1</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ГЛАВНАЯ КНОПКА КЛИКА - ВЫШЕ ВСЕГО -->
+        <div class="click-area-main">
+            <div id="clickButtonMain" class="click-button-main glow">
+                <div class="click-icon-main">🔇</div>
+            </div>
+            <div class="click-label">ИСКАТЬ ПРИПАСЫ</div>
+            <div id="clickDescription" class="click-description">
+                Нажмите для поиска ресурсов
             </div>
         </div>
 
@@ -688,15 +789,14 @@
 
         <!-- Табы -->
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('game')">🎮 Игра</div>
+            <div class="tab active" onclick="switchTab('resources')">📦 Ресурсы</div>
             <div class="tab" onclick="switchTab('upgrades')">🛠 Улучшения</div>
             <div class="tab" onclick="switchTab('autosearch')">🤖 Автопоиск</div>
             <div class="tab" onclick="switchTab('stats')">📊 Статистика</div>
         </div>
 
-        <!-- Вкладка игры -->
-        <div id="gameTab" class="tab-content active">
-            <!-- Ресурсы -->
+        <!-- Вкладка ресурсов -->
+        <div id="resourcesTab" class="tab-content active">
             <div class="resources-grid">
                 <div class="resource-card">
                     <div class="resource-icon">⚡</div>
@@ -718,38 +818,6 @@
                     <div class="resource-name">МЕДИКАМЕНТЫ</div>
                     <div id="meds" class="resource-value">0</div>
                 </div>
-            </div>
-
-            <!-- Прогресс дня -->
-            <div class="day-progress">
-                <div id="dayProgressBar" class="day-progress-bar" style="width: 14%;"></div>
-            </div>
-            <div style="text-align: center; color: var(--text-secondary); font-size: 0.9rem;">
-                До следующего дня: <span id="nextDayTimer">23:59:59</span>
-            </div>
-
-            <!-- Кнопка клика -->
-            <div class="click-area">
-                <div id="clickButton" class="click-button">
-                    <div class="click-icon">🔇</div>
-                </div>
-                <div class="click-label">Искать припасы</div>
-                <div id="clickDescription" style="margin-top: 10px; color: var(--text-secondary); font-size: 0.9rem;">
-                    Аккуратно открываете ящик...
-                </div>
-            </div>
-
-            <!-- Уведомление о клике -->
-            <div id="clickNotification" style="
-                text-align: center;
-                margin: 20px 0;
-                padding: 15px;
-                background: rgba(0, 255, 136, 0.1);
-                border-radius: 10px;
-                border: 1px solid rgba(0, 255, 136, 0.3);
-                display: none;
-            ">
-                <span id="clickReward">+2 ⚡, +1 🥫</span>
             </div>
         </div>
 
@@ -870,6 +938,13 @@
         <div id="notificationText">Уведомление</div>
     </div>
 
+    <!-- Клик-уведомление -->
+    <div id="clickNotification" class="click-notification">
+        <div id="clickReward" style="font-size: 1.8rem; font-weight: bold;">
+            <!-- Награды появляются здесь -->
+        </div>
+    </div>
+
     <script>
         // ==================== ИНИЦИАЛИЗАЦИЯ ====================
         let tg = null;
@@ -967,8 +1042,11 @@
             // Обновляем UI
             updateUI();
             
-            // Показываем анимацию
+            // Показываем анимацию клика
             showClickAnimation(rewards);
+            
+            // Обновляем описание клика
+            updateClickDescription();
             
             // Проверяем атаку
             if (gameState.noise >= 100) {
@@ -977,6 +1055,11 @@
             
             // Сохраняем состояние
             saveGameState();
+            
+            // Виброотклик (если доступно)
+            if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
+            }
         }
 
         function calculateClickRewards() {
@@ -1005,33 +1088,42 @@
         }
 
         function showClickAnimation(rewards) {
-            const button = document.getElementById('clickButton');
+            const button = document.getElementById('clickButtonMain');
             const notification = document.getElementById('clickNotification');
-            const rewardText = document.getElementById('clickReward');
+            const rewardDiv = document.getElementById('clickReward');
             
             // Анимация кнопки
             button.classList.add('shake');
-            setTimeout(() => button.classList.remove('shake'), 500);
+            setTimeout(() => button.classList.remove('shake'), 300);
             
-            // Показываем награду
-            const rewardStr = Object.entries(rewards)
+            // Показываем награду в центре экрана
+            rewardDiv.innerHTML = '';
+            const rewardsArray = Object.entries(rewards)
                 .filter(([_, value]) => value > 0)
                 .map(([key, value]) => {
                     const icons = { energy: '⚡', food: '🥫', parts: '🔧', meds: '💊' };
-                    return `+${value} ${icons[key]}`;
-                })
-                .join(', ');
+                    return `<span class="click-reward-item" style="animation-delay: ${Math.random() * 0.3}s">
+                        +${value} ${icons[key]}
+                    </span>`;
+                });
             
-            rewardText.textContent = rewardStr;
+            rewardDiv.innerHTML = rewardsArray.join('');
             notification.style.display = 'block';
             
-            // Скрываем через 2 секунды
+            // Скрываем через 1.5 секунды
             setTimeout(() => {
                 notification.style.display = 'none';
-            }, 2000);
+            }, 1500);
             
-            // Частицы
+            // Создаем частицы
             createParticles(button);
+            
+            // Анимация иконки
+            const icon = button.querySelector('.click-icon-main');
+            icon.style.transform = 'scale(1.3)';
+            setTimeout(() => {
+                icon.style.transform = 'scale(1)';
+            }, 200);
         }
 
         function createParticles(element) {
@@ -1039,13 +1131,17 @@
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
             
-            for (let i = 0; i < 5; i++) {
+            const particles = ['⚡', '🥫', '🔧', '💊', '✨', '🌟'];
+            
+            for (let i = 0; i < 8; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle float-up';
-                particle.innerHTML = ['⚡', '🥫', '🔧', '💊'][Math.floor(Math.random() * 4)];
-                particle.style.left = centerX + 'px';
-                particle.style.top = centerY + 'px';
-                particle.style.fontSize = Math.random() * 20 + 10 + 'px';
+                particle.innerHTML = particles[Math.floor(Math.random() * particles.length)];
+                particle.style.left = (centerX + Math.random() * 40 - 20) + 'px';
+                particle.style.top = (centerY + Math.random() * 40 - 20) + 'px';
+                particle.style.fontSize = (Math.random() * 20 + 15) + 'px';
+                particle.style.color = getRandomColor();
+                particle.style.animationDelay = (Math.random() * 0.3) + 's';
                 
                 document.body.appendChild(particle);
                 
@@ -1055,36 +1151,86 @@
             }
         }
 
+        function getRandomColor() {
+            const colors = ['#00ff88', '#4488ff', '#ffcc00', '#ff4444', '#ff00ff', '#00ffff'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        function updateClickDescription() {
+            const descriptions = {
+                low: [
+                    'Аккуратно открываете ящик...',
+                    'Тихо перебираете припасы...',
+                    'Осторожно сдвигаете мебель...',
+                    'Находите старые консервы...',
+                    'Извлекаете батарейки из техники...'
+                ],
+                medium: [
+                    'С легким стуком опрокидываете банку...',
+                    'Громко скрипит половица...',
+                    'Звякают инструменты в сумке...',
+                    'С шумом открываете шкаф...',
+                    'Падает стопка книг...'
+                ],
+                high: [
+                    'В панике роняете металлический поднос!',
+                    'С грохотом падает стеллаж!',
+                    'Разбивается стеклянная колба!',
+                    'Треснула дверь от удара!',
+                    'Рушится полка с банками!'
+                ]
+            };
+            
+            let descArray;
+            if (gameState.noise < 30) descArray = descriptions.low;
+            else if (gameState.noise < 70) descArray = descriptions.medium;
+            else descArray = descriptions.high;
+            
+            document.getElementById('clickDescription').textContent = 
+                descArray[Math.floor(Math.random() * descArray.length)];
+        }
+
         // ==================== СИСТЕМА ШУМА ====================
         function updateNoiseDisplay() {
             const noiseBar = document.getElementById('noiseBar');
             const noisePercent = document.getElementById('noisePercent');
             const noiseIcon = document.getElementById('noiseIcon');
             const noiseWarning = document.getElementById('noiseWarning');
-            const clickButton = document.getElementById('clickButton');
+            const clickButton = document.getElementById('clickButtonMain');
             
             // Обновляем проценты
-            noisePercent.textContent = `${Math.round(gameState.noise)}%`;
-            noiseBar.style.width = `${gameState.noise}%`;
+            const roundedNoise = Math.round(gameState.noise);
+            noisePercent.textContent = `${roundedNoise}%`;
+            noiseBar.style.width = `${roundedNoise}%`;
             
             // Обновляем цвет и иконку
             if (gameState.noise < 30) {
                 noiseBar.style.background = 'var(--noise-low)';
                 noiseIcon.textContent = '🔇';
                 noiseWarning.textContent = 'Полная тишина. Можно работать.';
+                noiseWarning.style.background = 'rgba(0, 255, 136, 0.1)';
+                noiseWarning.style.color = 'var(--accent-green)';
+                clickButton.classList.remove('panic');
             } else if (gameState.noise < 70) {
                 noiseBar.style.background = 'var(--noise-medium)';
                 noiseIcon.textContent = '🎤';
                 noiseWarning.textContent = 'Слышен легкий шелест. Будьте осторожны.';
+                noiseWarning.style.background = 'rgba(255, 204, 0, 0.1)';
+                noiseWarning.style.color = 'var(--accent-yellow)';
+                clickButton.classList.remove('panic');
             } else if (gameState.noise < 90) {
                 noiseBar.style.background = 'var(--accent-yellow)';
                 noiseIcon.textContent = '📢';
                 noiseWarning.textContent = 'Громкие звуки! Они могут услышать...';
-                clickButton.classList.add('panic');
+                noiseWarning.style.background = 'rgba(255, 204, 0, 0.2)';
+                noiseWarning.style.color = 'var(--accent-yellow)';
+                clickButton.classList.remove('panic');
             } else {
                 noiseBar.style.background = 'var(--noise-high)';
                 noiseIcon.textContent = '👹';
                 noiseWarning.textContent = 'СЛЫШАТ! Готовьтесь к атаке!';
+                noiseWarning.style.background = 'rgba(255, 68, 68, 0.2)';
+                noiseWarning.style.color = 'var(--accent-red)';
                 clickButton.classList.add('panic');
             }
             
@@ -1093,20 +1239,19 @@
                 noiseWarning.classList.add('show');
             } else {
                 noiseWarning.classList.remove('show');
-                clickButton.classList.remove('panic');
             }
             
             // Анимация иконки
-            noiseIcon.style.transform = `scale(${1 + gameState.noise / 200})`;
+            noiseIcon.style.transform = `scale(${1 + gameState.noise / 150}) rotate(${gameState.noise / 10}deg)`;
         }
 
         // Автоматическое снижение шума
         function autoNoiseDecay() {
             if (gameState.noise > 0) {
-                const decay = 2; // 2% в минуту
-                const minutesPassed = 1; // Так как вызывается каждую минуту
-                gameState.noise = Math.max(0, gameState.noise - decay * minutesPassed);
+                const decay = 2 + gameState.survivors - 1; // +1% за каждого выжившего
+                gameState.noise = Math.max(0, gameState.noise - decay);
                 updateNoiseDisplay();
+                updateUI();
                 saveGameState();
             }
         }
@@ -1138,7 +1283,7 @@
             gameState.nextDayTime = Date.now() + 24 * 60 * 60 * 1000;
             
             // Обновляем результат атаки
-            resultDiv.innerHTML = resultText + `<br>Ресурсы сохранены: ${Math.round((1 - penalty) * 100)}%`;
+            resultDiv.innerHTML = resultText + `<br><br>Ресурсы сохранены: ${Math.round((1 - penalty) * 100)}%`;
             
             // Показываем оверлей
             overlay.style.display = 'flex';
@@ -1146,6 +1291,11 @@
             
             // Сохраняем состояние
             saveGameState();
+            
+            // Виброотклик
+            if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('heavy');
+            }
         }
 
         function closeAttack() {
@@ -1153,6 +1303,9 @@
             overlay.style.display = 'none';
             document.body.style.overflow = 'auto';
             updateUI();
+            
+            // Обновляем описание клика
+            updateClickDescription();
         }
 
         // ==================== СИСТЕМА УЛУЧШЕНИЙ ====================
@@ -1247,7 +1400,7 @@
             // Проверяем стоимость
             for (const [resource, cost] of Object.entries(data.cost)) {
                 if (gameState.resources[resource] < cost) {
-                    showNotification(`Не хватает ${resource}!`, 'error');
+                    showNotification(`Не хватает ${getResourceName(resource)}!`, 'error');
                     return;
                 }
             }
@@ -1263,12 +1416,23 @@
             // Особые эффекты
             if (upgradeId === 'first_aid') {
                 gameState.survivors++;
+                showNotification('+1 выживший! Шум теперь снижается быстрее.', 'success');
             }
             
             showNotification(`Улучшение куплено: ${data.name}`, 'success');
             renderUpgrades();
             updateUI();
             saveGameState();
+        }
+
+        function getResourceName(resource) {
+            const names = {
+                energy: 'энергии',
+                food: 'еды',
+                parts: 'деталей',
+                meds: 'медикаментов'
+            };
+            return names[resource] || resource;
         }
 
         // ==================== АВТОПОИСК ====================
@@ -1292,19 +1456,25 @@
 
         // Симуляция работы автопоиска
         function simulateAutosearch() {
+            let gainedResources = false;
+            
             if (gameState.autosearch.robot) {
-                // +2 детали/час, +1% шума/час
-                gameState.resources.parts += 2;
-                gameState.noise = Math.min(100, gameState.noise + 1);
+                // +2 детали/час, +1% шума/час (x2 если есть night_vision)
+                let multiplier = gameState.upgrades.includes('night_vision') ? 2 : 1;
+                gameState.resources.parts += 2 * multiplier;
+                gameState.noise = Math.min(100, gameState.noise + 1 * multiplier);
+                gainedResources = true;
             }
             
             if (gameState.autosearch.watch) {
-                // +3 энергии/час, +0.5% шума/час
-                gameState.resources.energy += 3;
-                gameState.noise = Math.min(100, gameState.noise + 0.5);
+                // +3 энергии/час, +0.5% шума/час (x2 если есть night_vision)
+                let multiplier = gameState.upgrades.includes('night_vision') ? 2 : 1;
+                gameState.resources.energy += 3 * multiplier;
+                gameState.noise = Math.min(100, gameState.noise + 0.5 * multiplier);
+                gainedResources = true;
             }
             
-            if (gameState.autosearch.robot || gameState.autosearch.watch) {
+            if (gainedResources) {
                 updateUI();
                 saveGameState();
             }
@@ -1347,34 +1517,6 @@
             
             // Шум
             updateNoiseDisplay();
-            
-            // Прогресс дня
-            const timeLeft = gameState.nextDayTime - Date.now();
-            if (timeLeft > 0) {
-                const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-                document.getElementById('nextDayTimer').textContent = 
-                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                
-                const progress = 100 - (timeLeft / (24 * 60 * 60 * 1000)) * 100;
-                document.getElementById('dayProgressBar').style.width = `${progress}%`;
-            }
-            
-            // Описание клика в зависимости от шума
-            const descriptions = {
-                low: ['Аккуратно открываете ящик...', 'Тихо перебираете припасы...', 'Осторожно сдвигаете мебель...'],
-                medium: ['С легким стуком опрокидываете банку...', 'Громко скрипит половица...', 'Звякают инструменты в сумке...'],
-                high: ['В панике роняете металлический поднос!', 'С грохотом падает стеллаж!', 'Разбивается стеклянная колба!']
-            };
-            
-            let descArray;
-            if (gameState.noise < 30) descArray = descriptions.low;
-            else if (gameState.noise < 70) descArray = descriptions.medium;
-            else descArray = descriptions.high;
-            
-            document.getElementById('clickDescription').textContent = 
-                descArray[Math.floor(Math.random() * descArray.length)];
         }
 
         function getResourceIcon(resource) {
@@ -1403,23 +1545,37 @@
         // ==================== ТАЙМЕРЫ ====================
         setInterval(autoNoiseDecay, 60000); // Каждую минуту
         setInterval(simulateAutosearch, 3600000); // Каждый час
-        setInterval(updateUI, 1000); // Обновление таймера каждую секунду
 
         // ==================== ЗАПУСК ====================
         document.addEventListener('DOMContentLoaded', () => {
             initTelegram();
             
             // Назначаем обработчик клика
-            document.getElementById('clickButton').addEventListener('click', handleClick);
+            document.getElementById('clickButtonMain').addEventListener('click', handleClick);
             
-            // Первоначальный рендеринг/
+            // Первоначальный рендеринг
             updateUI();
             renderUpgrades();
             updateAutosearchUI();
+            updateClickDescription();
             
             // Стартовое сообщение
             setTimeout(() => {
-                showNotification('Добро пожаловать в бункер! Кликайте, чтобы искать припасы, но следите за шумом!', 'success');
+                showNotification('Добро пожаловать в бункер! Кликайте для поиска припасов. Следите за уровнем шума!', 'success');
+            }, 1000);
+            
+            // Обновляем иконку кнопки в зависимости от шума
+            setInterval(() => {
+                const icon = document.querySelector('.click-icon-main');
+                if (gameState.noise < 30) {
+                    icon.textContent = '🔇';
+                } else if (gameState.noise < 70) {
+                    icon.textContent = '🎤';
+                } else if (gameState.noise < 90) {
+                    icon.textContent = '📢';
+                } else {
+                    icon.textContent = '👹';
+                }
             }, 1000);
         });
     </script>
