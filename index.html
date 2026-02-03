@@ -3,1210 +3,1425 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✨ Cosmic Clicker | Telegram Game</title>
-    <script src="https://telegram.org/js/tma.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>ТИШИНА | Постапокалиптический кликер</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root {
-            --bg-space: #0a0e17;
-            --bg-card: rgba(16, 23, 41, 0.95);
-            --primary: #6c5ce7;
-            --secondary: #00cec9;
-            --accent: #fd79a8;
-            --gold: #ffd700;
-            --text: #ffffff;
-            --text-dim: #a0a8c3;
-            --border: rgba(108, 92, 231, 0.3);
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            --radius: 24px;
-            --radius-sm: 16px;
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-            -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
 
-        body {
-            background: var(--bg-space);
-            color: var(--text);
-            min-height: 100vh;
-            overflow-x: hidden;
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(108, 92, 231, 0.15) 0%, transparent 20%),
-                radial-gradient(circle at 80% 70%, rgba(0, 206, 201, 0.1) 0%, transparent 20%);
-            touch-action: manipulation;
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #aaaaaa;
+            --accent-green: #00ff88;
+            --accent-yellow: #ffcc00;
+            --accent-red: #ff4444;
+            --accent-blue: #4488ff;
+            --noise-low: #00ff88;
+            --noise-medium: #ffcc00;
+            --noise-high: #ff4444;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
 
-        /* Контейнер */
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
+        body {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, #1a0f1a 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
             padding: 20px;
             position: relative;
-            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* Звёзды на фоне */
-        .stars {
+        body::before {
+            content: '';
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 0, 100, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(0, 200, 255, 0.05) 0%, transparent 50%);
+            pointer-events: none;
             z-index: -1;
-            pointer-events: none;
         }
 
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 3s infinite alternate;
-            pointer-events: none;
-        }
-
-        @keyframes twinkle {
-            0% { opacity: 0.3; }
-            100% { opacity: 1; }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding-bottom: 100px;
         }
 
         /* Шапка */
         .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.03) 50%,
+                transparent 70%
+            );
+            animation: shine 8s infinite linear;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(0, 200, 255, 0.3);
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        /* Шумометр */
+        .noise-meter {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .noise-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0 25px;
+            margin-bottom: 15px;
         }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .noise-icon {
+            font-size: 2rem;
+            transition: transform 0.3s;
         }
 
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            box-shadow: var(--shadow);
+        .noise-bar-container {
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .noise-bar {
+            height: 100%;
+            width: 0%;
+            border-radius: 15px;
+            transition: width 0.5s ease, background 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .noise-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.2) 50%, 
+                transparent 100%);
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .logo-text {
-            font-size: 24px;
-            font-weight: 800;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* Блок валюты */
-        .currency-display {
-            background: var(--bg-card);
-            backdrop-filter: blur(10px);
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 25px;
-            border: 2px solid var(--border);
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .currency-display::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
-        }
-
-        .currency-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--text-dim);
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-
-        .currency-amount {
-            font-size: 52px;
-            font-weight: 800;
-            text-align: center;
-            margin: 15px 0;
-            background: linear-gradient(90deg, var(--gold), #ffed4e);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
-            transition: transform 0.2s;
-        }
-
-        .currency-amount.animate {
-            animation: bounce 0.3s;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .income-per-second {
-            text-align: center;
-            color: var(--secondary);
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        /* Главная кнопка кликера - ИЗМЕНЕНО */
-        .clicker-area {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 30px;
-            margin: 25px 0;
-            border: 2px solid var(--border);
-            box-shadow: var(--shadow);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            -webkit-user-select: none;
-            user-select: none;
-            touch-action: manipulation;
-        }
-
-        .clicker-button {
-            width: 180px;
-            height: 180px;
-            background: linear-gradient(135deg, var(--primary), #845ef7);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            box-shadow: 
-                0 0 60px rgba(108, 92, 231, 0.5),
-                inset 0 8px 20px rgba(255, 255, 255, 0.2);
-            transition: all 0.1s;
-            position: relative;
-            margin-bottom: 25px;
-            touch-action: manipulation;
-        }
-
-        .clicker-button.active {
-            transform: scale(0.95);
-            box-shadow: 
-                0 0 40px rgba(108, 92, 231, 0.7),
-                inset 0 8px 20px rgba(255, 255, 255, 0.1);
-        }
-
-        .clicker-button::after {
-            content: '';
-            position: absolute;
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            border: 3px dashed rgba(255, 255, 255, 0.2);
-            animation: rotate 20s linear infinite;
-        }
-
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .clicker-label {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-dim);
-            margin-top: 10px;
-        }
-
-        .click-value {
-            position: absolute;
-            font-weight: 800;
-            color: var(--gold);
-            pointer-events: none;
-            animation: floatUp 1s forwards;
-            font-size: 24px;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-            z-index: 1000;
-        }
-
-        @keyframes floatUp {
-            0% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-100px) scale(1.5);
-            }
-        }
-
-        /* Улучшения */
-        .upgrades {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 25px;
-            margin: 25px 0;
-            border: 2px solid var(--border);
-            box-shadow: var(--shadow);
-        }
-
-        .upgrades-title {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 20px;
-            margin-bottom: 20px;
-            color: var(--text);
-        }
-
-        .upgrade-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: var(--radius-sm);
-            padding: 18px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: all 0.3s;
-            border: 1px solid transparent;
-            cursor: pointer;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .upgrade-item:active {
-            transform: scale(0.98);
-            background: rgba(108, 92, 231, 0.15);
-        }
-
-        .upgrade-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex: 1;
-        }
-
-        .upgrade-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-        }
-
-        .upgrade-text h3 {
-            font-size: 16px;
-            margin-bottom: 4px;
-        }
-
-        .upgrade-text p {
-            font-size: 12px;
-            color: var(--text-dim);
-        }
-
-        .upgrade-cost {
-            text-align: right;
-            min-width: 100px;
-        }
-
-        .upgrade-cost .cost {
-            font-weight: 800;
-            color: var(--gold);
-            font-size: 18px;
-        }
-
-        .upgrade-cost .income {
-            color: var(--secondary);
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        /* Автокликеры */
-        .autoclickers {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 25px;
-            margin: 25px 0 80px;
-            border: 2px solid var(--border);
-            box-shadow: var(--shadow);
-        }
-
-        .autoclicker-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: var(--radius-sm);
-            margin-bottom: 10px;
-            border-left: 4px solid var(--secondary);
-            cursor: pointer;
-            touch-action: manipulation;
-        }
-
-        .autoclicker-item:active {
-            transform: scale(0.98);
-            background: rgba(0, 206, 201, 0.1);
-        }
-
-        .autoclicker-icon {
-            width: 44px;
-            height: 44px;
-            background: rgba(0, 206, 201, 0.2);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            color: var(--secondary);
-        }
-
-        .autoclicker-info h4 {
-            font-size: 15px;
-            margin-bottom: 3px;
-        }
-
-        .autoclicker-info p {
-            font-size: 12px;
-            color: var(--text-dim);
-        }
-
-        .autoclicker-count {
-            margin-left: auto;
-            font-weight: 800;
-            font-size: 24px;
-            color: var(--secondary);
-            min-width: 50px;
-            text-align: right;
-        }
-
-        /* Бонусы */
-        .bonus-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, var(--accent), #e84393);
-            color: white;
-            padding: 15px 20px;
-            border-radius: var(--radius-sm);
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            z-index: 1000;
-            animation: slideIn 0.5s, slideOut 0.5s 2.5s forwards;
-            transform: translateX(120%);
-        }
-
-        @keyframes slideIn {
-            to { transform: translateX(0); }
-        }
-
-        @keyframes slideOut {
-            to { transform: translateX(120%); }
-        }
-
-        /* Адаптивность */
-        @media (max-width: 480px) {
-            .container { padding: 15px; }
-            .currency-amount { font-size: 44px; }
-            .clicker-button { 
-                width: 160px; 
-                height: 160px; 
-                font-size: 42px;
-            }
-            .clicker-button::after { 
-                width: 180px; 
-                height: 180px; 
-            }
-        }
-
-        /* Прогресс-бар */
-        .progress-bar {
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-            margin: 20px 0;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            border-radius: 3px;
-            width: 0%;
-            transition: width 0.5s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
             0% { transform: translateX(-100%); }
             100% { transform: translateX(100%); }
         }
 
-        /* Сообщение о загрузке */
-        .loading {
+        .noise-warning {
+            text-align: center;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        .noise-warning.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Ресурсы */
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .resource-card {
+            background: rgba(42, 42, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-blue);
+            box-shadow: 0 10px 20px rgba(68, 136, 255, 0.2);
+        }
+
+        .resource-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .resource-name {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .resource-value {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #fff, var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Кнопка клика */
+        .click-area {
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        .click-button {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle at center, 
+                var(--bg-card) 0%, 
+                var(--bg-secondary) 100%);
+            border-radius: 50%;
+            border: 4px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            box-shadow: 
+                0 0 60px rgba(0, 200, 255, 0.2),
+                inset 0 0 40px rgba(255, 255, 255, 0.1);
+        }
+
+        .click-button:active {
+            transform: scale(0.95);
+            box-shadow: 
+                0 0 100px rgba(0, 200, 255, 0.4),
+                inset 0 0 60px rgba(255, 255, 255, 0.2);
+        }
+
+        .click-button.panic {
+            animation: panicPulse 0.5s infinite;
+            border-color: var(--accent-red) !important;
+        }
+
+        @keyframes panicPulse {
+            0%, 100% { box-shadow: 0 0 60px rgba(255, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 100px rgba(255, 68, 68, 0.8); }
+        }
+
+        .click-icon {
+            font-size: 4rem;
+            transition: transform 0.3s;
+        }
+
+        .click-button:hover .click-icon {
+            transform: scale(1.1);
+        }
+
+        .click-label {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        /* Улучшения */
+        .upgrades-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .upgrade-card {
+            background: rgba(42, 42, 42, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upgrade-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .upgrade-card.owned {
+            border-color: var(--accent-green);
+        }
+
+        .upgrade-card.locked {
+            opacity: 0.6;
+            filter: grayscale(0.5);
+        }
+
+        .upgrade-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .upgrade-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .upgrade-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .upgrade-cost {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .cost-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .cost-item.affordable {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--accent-green);
+        }
+
+        .upgrade-button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(45deg, var(--accent-blue), #667eea);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upgrade-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(68, 136, 255, 0.4);
+        }
+
+        .upgrade-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Автопоиск */
+        .autosearch-panel {
+            background: rgba(26, 26, 26, 0.9);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 25px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .autosearch-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: rgba(42, 42, 42, 0.5);
+            border-radius: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .autosearch-toggle:hover {
+            background: rgba(42, 42, 42, 0.8);
+        }
+
+        .toggle-switch {
+            width: 60px;
+            height: 30px;
+            background: rgba(255, 68, 68, 0.3);
+            border-radius: 15px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: rgba(0, 255, 136, 0.3);
+        }
+
+        .toggle-slider {
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(30px);
+        }
+
+        /* Анимации */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .float-up {
+            animation: floatUp 1s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) scale(0);
+                opacity: 0;
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(42, 42, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-left: 4px solid var(--accent-green);
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            transform: translateX(150%);
+            transition: transform 0.5s;
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            border-left-color: var(--accent-red);
+        }
+
+        .notification.warning {
+            border-left-color: var(--accent-yellow);
+        }
+
+        /* Атака */
+        .attack-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--bg-space);
-            display: flex;
-            align-items: center;
+            background: rgba(255, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            display: none;
             justify-content: center;
+            align-items: center;
             z-index: 2000;
-            transition: opacity 0.5s;
+            animation: redPulse 0.2s infinite;
         }
 
-        .loading.hidden {
-            opacity: 0;
-            pointer-events: none;
+        @keyframes redPulse {
+            0%, 100% { background: rgba(255, 0, 0, 0.2); }
+            50% { background: rgba(255, 0, 0, 0.4); }
         }
 
-        .loader {
-            width: 80px;
-            height: 80px;
-            border: 4px solid transparent;
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .attack-modal {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            border: 3px solid var(--accent-red);
+            box-shadow: 0 0 100px rgba(255, 0, 0, 0.5);
+            animation: modalAppear 0.3s;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Табы */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 25px;
+            background: rgba(42, 42, 42, 0.5);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            border: 2px solid transparent;
+        }
+
+        .tab:hover {
+            background: rgba(42, 42, 42, 0.8);
+        }
+
+        .tab.active {
+            background: rgba(68, 136, 255, 0.2);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Прогресс дня */
+        .day-progress {
+            background: rgba(0, 0, 0, 0.3);
+            height: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .day-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+            width: 0%;
+            transition: width 1s ease;
+            position: relative;
+        }
+
+        .day-progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                transparent 100%);
+            animation: progressShine 2s infinite;
+        }
+
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Мобильная адаптация */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .click-button {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .upgrades-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                justify-content: center;
+            }
+            
+            .tab {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Экран загрузки -->
-    <div class="loading" id="loading">
-        <div class="loader"></div>
-    </div>
-
-    <!-- Звёздный фон -->
-    <div class="stars" id="stars"></div>
-
-    <!-- Основной контейнер -->
     <div class="container">
         <!-- Шапка -->
         <div class="header">
-            <div class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-meteor"></i>
+            <h1 class="title">🔇 ТИШИНА</h1>
+            <p class="subtitle">Постапокалиптический кликер выживания</p>
+            
+            <div class="day-info">
+                <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                    <div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">День</div>
+                        <div id="day" style="font-size: 2rem; font-weight: bold;">1</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">Выжившие</div>
+                        <div id="survivors" style="font-size: 2rem; font-weight: bold;">1</div>
+                    </div>
                 </div>
-                <div class="logo-text">Cosmic Clicker</div>
-            </div>
-            <div class="level">Ур. <span id="level">1</span></div>
-        </div>
-
-        <!-- Отображение валюты -->
-        <div class="currency-display">
-            <div class="currency-title">
-                <i class="fas fa-coins"></i>
-                <span>КОСМИЧЕСКИЕ КОИНЫ</span>
-            </div>
-            <div class="currency-amount" id="currency">0</div>
-            <div class="income-per-second" id="incomePerSecond">+0 в секунду</div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="levelProgress"></div>
-            </div>
-            <div style="text-align: center; color: var(--text-dim); font-size: 12px;">
-                До следующего уровня: <span id="xpToNext">100</span> XP
             </div>
         </div>
 
-        <!-- Главный кликер -->
-        <div class="clicker-area" id="clickerArea">
-            <div class="clicker-button" id="clickerButton">
-                <i class="fas fa-gem"></i>
+        <!-- Шумометр -->
+        <div class="noise-meter">
+            <div class="noise-header">
+                <div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">Уровень шума</div>
+                    <div id="noisePercent" style="font-size: 1.5rem; font-weight: bold;">0%</div>
+                </div>
+                <div id="noiseIcon" class="noise-icon">🔇</div>
             </div>
-            <div class="clicker-label">НАЖМИ СИЛЬНЕЕ!</div>
-            <div class="clicker-stats">
-                <div style="margin-top: 15px; display: flex; gap: 20px; justify-content: center;">
+            
+            <div class="noise-bar-container">
+                <div id="noiseBar" class="noise-bar" style="width: 0%; background: var(--noise-low);"></div>
+            </div>
+            
+            <div id="noiseWarning" class="noise-warning">
+                <!-- Сообщения появляются здесь -->
+            </div>
+        </div>
+
+        <!-- Табы -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('game')">🎮 Игра</div>
+            <div class="tab" onclick="switchTab('upgrades')">🛠 Улучшения</div>
+            <div class="tab" onclick="switchTab('autosearch')">🤖 Автопоиск</div>
+            <div class="tab" onclick="switchTab('stats')">📊 Статистика</div>
+        </div>
+
+        <!-- Вкладка игры -->
+        <div id="gameTab" class="tab-content active">
+            <!-- Ресурсы -->
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon">⚡</div>
+                    <div class="resource-name">ЭНЕРГИЯ</div>
+                    <div id="energy" class="resource-value">10</div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">🥫</div>
+                    <div class="resource-name">ПРОДУКТЫ</div>
+                    <div id="food" class="resource-value">5</div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">🔧</div>
+                    <div class="resource-name">ДЕТАЛИ</div>
+                    <div id="parts" class="resource-value">0</div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">💊</div>
+                    <div class="resource-name">МЕДИКАМЕНТЫ</div>
+                    <div id="meds" class="resource-value">0</div>
+                </div>
+            </div>
+
+            <!-- Прогресс дня -->
+            <div class="day-progress">
+                <div id="dayProgressBar" class="day-progress-bar" style="width: 14%;"></div>
+            </div>
+            <div style="text-align: center; color: var(--text-secondary); font-size: 0.9rem;">
+                До следующего дня: <span id="nextDayTimer">23:59:59</span>
+            </div>
+
+            <!-- Кнопка клика -->
+            <div class="click-area">
+                <div id="clickButton" class="click-button">
+                    <div class="click-icon">🔇</div>
+                </div>
+                <div class="click-label">Искать припасы</div>
+                <div id="clickDescription" style="margin-top: 10px; color: var(--text-secondary); font-size: 0.9rem;">
+                    Аккуратно открываете ящик...
+                </div>
+            </div>
+
+            <!-- Уведомление о клике -->
+            <div id="clickNotification" style="
+                text-align: center;
+                margin: 20px 0;
+                padding: 15px;
+                background: rgba(0, 255, 136, 0.1);
+                border-radius: 10px;
+                border: 1px solid rgba(0, 255, 136, 0.3);
+                display: none;
+            ">
+                <span id="clickReward">+2 ⚡, +1 🥫</span>
+            </div>
+        </div>
+
+        <!-- Вкладка улучшений -->
+        <div id="upgradesTab" class="tab-content">
+            <div class="upgrades-grid">
+                <!-- Улучшения генерируются через JS -->
+            </div>
+        </div>
+
+        <!-- Вкладка автопоиска -->
+        <div id="autosearchTab" class="tab-content">
+            <div class="autosearch-panel">
+                <h3 style="margin-bottom: 20px; text-align: center;">🤖 АВТОПОИСК</h3>
+                
+                <div class="autosearch-toggle" onclick="toggleAutosearch('robot')">
+                    <div>
+                        <div style="font-weight: bold;">Робот-сборщик</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                            +2 детали/час | Шум: +1%/час
+                        </div>
+                    </div>
+                    <div class="toggle-switch" id="robotSwitch">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+
+                <div class="autosearch-toggle" onclick="toggleAutosearch('watch')">
+                    <div>
+                        <div style="font-weight: bold;">Ночной дозор</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                            +3 энергии/час | Шум: +0.5%/час
+                        </div>
+                    </div>
+                    <div class="toggle-switch" id="watchSwitch">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка статистики -->
+        <div id="statsTab" class="tab-content">
+            <div style="background: rgba(42, 42, 42, 0.8); padding: 25px; border-radius: 20px;">
+                <h3 style="margin-bottom: 20px; text-align: center;">📊 СТАТИСТИКА</h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px;">
                     <div style="text-align: center;">
-                        <div style="color: var(--text-dim); font-size: 12px;">За клик</div>
-                        <div style="color: var(--gold); font-weight: 800;" id="clickPower">1</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">Кликов</div>
+                        <div id="statClicks" style="font-size: 2rem; font-weight: bold;">0</div>
                     </div>
                     <div style="text-align: center;">
-                        <div style="color: var(--text-dim); font-size: 12px;">Всего кликов</div>
-                        <div style="color: var(--secondary); font-weight: 800;" id="totalClicks">0</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">Атак</div>
+                        <div id="statAttacks" style="font-size: 2rem; font-weight: bold;">0</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">Дней</div>
+                        <div id="statDays" style="font-size: 2rem; font-weight: bold;">1</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">Шум макс.</div>
+                        <div id="statMaxNoise" style="font-size: 2rem; font-weight: bold;">0%</div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Улучшения -->
-        <div class="upgrades">
-            <div class="upgrades-title">
-                <i class="fas fa-arrow-up"></i>
-                <span>УЛУЧШЕНИЯ</span>
-            </div>
-            
-            <div class="upgrade-item" id="upgrade1">
-                <div class="upgrade-info">
-                    <div class="upgrade-icon">
-                        <i class="fas fa-fist-raised"></i>
-                    </div>
-                    <div class="upgrade-text">
-                        <h3>Сила клика</h3>
-                        <p>Увеличивает доход за клик</p>
-                    </div>
-                </div>
-                <div class="upgrade-cost">
-                    <div class="cost" data-cost="10">10</div>
-                    <div class="income">+1 за клик</div>
-                </div>
-            </div>
-            
-            <div class="upgrade-item" id="upgrade2">
-                <div class="upgrade-info">
-                    <div class="upgrade-icon">
-                        <i class="fas fa-bolt"></i>
-                    </div>
-                    <div class="upgrade-text">
-                        <h3>Скорость клика</h3>
-                        <p>Кликайте быстрее</p>
+                <h4 style="margin: 20px 0 10px 0; color: var(--text-secondary);">🏆 ДОСТИЖЕНИЯ</h4>
+                <div id="achievements" style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="
+                        background: rgba(0, 255, 136, 0.1);
+                        padding: 10px 15px;
+                        border-radius: 10px;
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        border: 1px solid rgba(0, 255, 136, 0.3);
+                    ">
+                        <div>✅</div>
+                        <div>
+                            <div style="font-weight: bold;">Новобранец</div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary);">Сделать первый клик</div>
+                        </div>
                     </div>
                 </div>
-                <div class="upgrade-cost">
-                    <div class="cost" data-cost="50">50</div>
-                    <div class="income">+0.5 за клик</div>
-                </div>
-            </div>
-            
-            <div class="upgrade-item" id="upgrade3">
-                <div class="upgrade-info">
-                    <div class="upgrade-icon">
-                        <i class="fas fa-magic"></i>
-                    </div>
-                    <div class="upgrade-text">
-                        <h3>Критический удар</h3>
-                        <p>Шанс x5 дохода</p>
-                    </div>
-                </div>
-                <div class="upgrade-cost">
-                    <div class="cost" data-cost="100">100</div>
-                    <div class="income">5% шанс</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Автокликеры -->
-        <div class="autoclickers">
-            <div class="upgrades-title">
-                <i class="fas fa-robot"></i>
-                <span>АВТОКЛИКЕРЫ</span>
-            </div>
-            
-            <div class="autoclicker-item" id="autoclickerItem1">
-                <div class="autoclicker-icon">
-                    <i class="fas fa-satellite"></i>
-                </div>
-                <div class="autoclicker-info">
-                    <h4>Космический спутник</h4>
-                    <p>Автоматически кликает за вас</p>
-                </div>
-                <div class="autoclicker-count" id="autoclicker1">0</div>
-            </div>
-            
-            <div class="autoclicker-item" id="autoclickerItem2">
-                <div class="autoclicker-icon">
-                    <i class="fas fa-rocket"></i>
-                </div>
-                <div class="autoclicker-info">
-                    <h4>Ракетный ускоритель</h4>
-                    <p>Быстрые автоматические клики</p>
-                </div>
-                <div class="autoclicker-count" id="autoclicker2">0</div>
-            </div>
-            
-            <div class="autoclicker-item" id="autoclickerItem3">
-                <div class="autoclicker-icon">
-                    <i class="fas fa-user-astronaut"></i>
-                </div>
-                <div class="autoclicker-info">
-                    <h4>Космический астронавт</h4>
-                    <p>Профессиональный кликер</p>
-                </div>
-                <div class="autoclicker-count" id="autoclicker3">0</div>
             </div>
         </div>
     </div>
 
+    <!-- Оверлей атаки -->
+    <div id="attackOverlay" class="attack-overlay">
+        <div class="attack-modal">
+            <div style="font-size: 3rem; margin-bottom: 20px;">👹</div>
+            <h2 style="color: var(--accent-red); margin-bottom: 20px;">АТАКА!</h2>
+            <p style="margin-bottom: 30px; line-height: 1.5;">
+                Существа услышали вас!<br>
+                Они ломают дверь бункера!
+            </p>
+            <div id="attackResult" style="margin-bottom: 30px; padding: 20px; background: rgba(255, 68, 68, 0.1); border-radius: 10px;">
+                <!-- Результат атаки -->
+            </div>
+            <button onclick="closeAttack()" style="
+                padding: 15px 40px;
+                background: linear-gradient(45deg, var(--accent-red), #ff0066);
+                border: none;
+                border-radius: 50px;
+                color: white;
+                font-weight: bold;
+                font-size: 1.1rem;
+                cursor: pointer;
+                transition: all 0.3s;
+            ">
+                ПРОДОЛЖИТЬ
+            </button>
+        </div>
+    </div>
+
+    <!-- Уведомления -->
+    <div id="notification" class="notification">
+        <div id="notificationText">Уведомление</div>
+    </div>
+
     <script>
-        // Инициализация Telegram Web App
-        const tg = window.Telegram.WebApp;
-        
-        // Инициализируем только если Telegram Web App доступен
-        if (tg && tg.initData) {
-            tg.expand();
-            tg.enableClosingConfirmation();
-        }
-        
-        // Игровые переменные
-        let currency = 0;
-        let clickPower = 1;
-        let totalClicks = 0;
-        let incomePerSecond = 0;
-        let level = 1;
-        let xp = 0;
-        let xpToNextLevel = 100;
-        let isInitialized = false;
-        
-        // Улучшения
-        const upgrades = {
-            power: { level: 0, cost: 10, multiplier: 1 },
-            speed: { level: 0, cost: 50, multiplier: 0.5 },
-            critical: { level: 0, cost: 100, chance: 0.05 }
+        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+        let tg = null;
+        let gameState = {
+            day: 1,
+            survivors: 1,
+            resources: {
+                energy: 10,
+                food: 5,
+                parts: 0,
+                meds: 0
+            },
+            noise: 0,
+            upgrades: [],
+            autosearch: {
+                robot: false,
+                watch: false
+            },
+            stats: {
+                clicks: 0,
+                attacks: 0,
+                maxNoise: 0
+            },
+            lastClickTime: Date.now(),
+            nextDayTime: Date.now() + 24 * 60 * 60 * 1000 // Через 24 часа
         };
-        
-        // Автокликеры
-        const autoclickers = [
-            { id: 'satellite', count: 0, baseCost: 15, income: 0.1 },
-            { id: 'rocket', count: 0, baseCost: 100, income: 1 },
-            { id: 'astronaut', count: 0, baseCost: 500, income: 5 }
-        ];
-        
-        // Создание звёздного фона
-        function createStars() {
-            const starsContainer = document.getElementById('stars');
-            starsContainer.innerHTML = '';
-            for (let i = 0; i < 80; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                const size = Math.random() * 3;
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                star.style.left = `${Math.random() * 100}%`;
-                star.style.top = `${Math.random() * 100}%`;
-                star.style.animationDelay = `${Math.random() * 3}s`;
-                starsContainer.appendChild(star);
-            }
-        }
-        
-        // Форматирование чисел
-        function formatNumber(num) {
-            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-            return Math.floor(num);
-        }
-        
-        // Обновление UI
-        function updateUI() {
-            // Валюту
-            const currencyEl = document.getElementById('currency');
-            currencyEl.textContent = formatNumber(currency);
-            
-            // Анимация при изменении
-            currencyEl.classList.add('animate');
-            setTimeout(() => currencyEl.classList.remove('animate'), 300);
-            
-            // Доход в секунду
-            document.getElementById('incomePerSecond').textContent = 
-                `+${formatNumber(incomePerSecond)} в секунду`;
-            
-            // Мощность клика
-            document.getElementById('clickPower').textContent = formatNumber(clickPower);
-            
-            // Всего кликов
-            document.getElementById('totalClicks').textContent = formatNumber(totalClicks);
-            
-            // Уровень
-            document.getElementById('level').textContent = level;
-            
-            // Прогресс уровня
-            const progressPercent = (xp / xpToNextLevel) * 100;
-            document.getElementById('levelProgress').style.width = `${progressPercent}%`;
-            document.getElementById('xpToNext').textContent = formatNumber(xpToNextLevel - xp);
-            
-            // Обновление стоимости улучшений
-            document.querySelectorAll('.upgrade-item').forEach((item, index) => {
-                const costEl = item.querySelector('.cost');
-                let cost;
-                if (index === 0) cost = upgrades.power.cost;
-                else if (index === 1) cost = upgrades.speed.cost;
-                else if (index === 2) cost = upgrades.critical.cost;
+
+        // Инициализация Telegram Web App
+        function initTelegram() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                tg = Telegram.WebApp;
+                tg.expand();
+                tg.ready();
                 
-                costEl.textContent = formatNumber(cost);
-                costEl.dataset.cost = cost;
-                
-                // Проверка, можем ли купить
-                if (currency >= cost) {
-                    item.style.opacity = '1';
-                    item.style.cursor = 'pointer';
-                    item.style.pointerEvents = 'auto';
-                } else {
-                    item.style.opacity = '0.6';
-                    item.style.cursor = 'not-allowed';
-                    item.style.pointerEvents = 'none';
-                }
-            });
-            
-            // Обновление автокликеров
-            document.getElementById('autoclicker1').textContent = autoclickers[0].count;
-            document.getElementById('autoclicker2').textContent = autoclickers[1].count;
-            document.getElementById('autoclicker3').textContent = autoclickers[2].count;
-        }
-        
-        // Обработчик клика по основной кнопке
-        function handleClick(event) {
-            if (!isInitialized) return;
-            
-            // Предотвращаем поведение по умолчанию
-            event.preventDefault();
-            event.stopPropagation();
-            
-            // Вибрация
-            if (tg && tg.HapticFeedback) {
-                tg.HapticFeedback.impactOccurred('light');
-            }
-            
-            // Анимация кнопки
-            const button = document.getElementById('clickerButton');
-            button.classList.add('active');
-            setTimeout(() => button.classList.remove('active'), 100);
-            
-            // Позиция для анимации
-            const rect = button.getBoundingClientRect();
-            const x = rect.left + rect.width / 2;
-            const y = rect.top + rect.height / 2;
-            
-            // Случайный критический удар
-            let isCritical = false;
-            if (Math.random() < upgrades.critical.chance * upgrades.critical.level) {
-                isCritical = true;
-                clickPower *= 5;
-            }
-            
-            // Добавление валюты
-            let earned = clickPower;
-            if (isCritical) {
-                earned *= 5;
-                showBonus('КРИТИЧЕСКИЙ УДАР!', '#fd79a8');
-            }
-            
-            currency += earned;
-            totalClicks++;
-            xp += earned;
-            
-            // Анимация текста
-            createClickAnimation(x, y, earned, isCritical);
-            
-            // Проверка уровня
-            checkLevelUp();
-            
-            // Обновление интерфейса
-            updateUI();
-            
-            // Возвращаем обычную силу, если был критический
-            if (isCritical) {
-                clickPower = 1 + upgrades.power.level * upgrades.power.multiplier + upgrades.speed.level * upgrades.speed.multiplier;
-            }
-            
-            // Сохраняем прогресс
-            saveGame();
-            
-            return false;
-        }
-        
-        // Анимация клика
-        function createClickAnimation(x, y, amount, isCritical) {
-            const clickValue = document.createElement('div');
-            clickValue.className = 'click-value';
-            clickValue.textContent = '+' + formatNumber(amount);
-            clickValue.style.left = (x - 30) + 'px';
-            clickValue.style.top = (y - 30) + 'px';
-            
-            if (isCritical) {
-                clickValue.style.color = '#fd79a8';
-                clickValue.style.fontSize = '32px';
-                clickValue.style.textShadow = '0 0 20px #fd79a8';
-            }
-            
-            document.body.appendChild(clickValue);
-            
-            setTimeout(() => {
-                if (clickValue.parentNode) {
-                    clickValue.parentNode.removeChild(clickValue);
-                }
-            }, 1000);
-        }
-        
-        // Покупка улучшения
-        function buyUpgrade(upgradeId) {
-            if (!isInitialized) return;
-            
-            const upgrade = upgrades[upgradeId];
-            const cost = upgrade.cost;
-            
-            if (currency >= cost) {
-                // Вибрация
-                if (tg && tg.HapticFeedback) {
-                    tg.HapticFeedback.impactOccurred('medium');
+                // Устанавливаем цветовую тему
+                if (tg.colorScheme === 'dark') {
+                    document.documentElement.style.setProperty('--bg-primary', '#0a0a0a');
+                    document.documentElement.style.setProperty('--bg-secondary', '#1a1a1a');
                 }
                 
-                // Покупка
-                currency -= cost;
-                upgrade.level++;
-                upgrade.cost = Math.floor(cost * 1.5);
-                
-                // Обновляем силу клика
-                if (upgradeId === 'power') {
-                    clickPower += upgrade.multiplier;
-                } else if (upgradeId === 'speed') {
-                    clickPower += upgrade.multiplier;
-                } else if (upgradeId === 'critical') {
-                    upgrade.chance += 0.02;
-                }
-                
-                // Показываем уведомление
-                showBonus('УЛУЧШЕНИЕ КУПЛЕНО!', '#6c5ce7');
-                
-                // Обновляем интерфейс
-                updateUI();
-                saveGame();
+                // Загружаем сохраненное состояние
+                loadGameState();
             } else {
-                if (tg && tg.HapticFeedback) {
-                    tg.HapticFeedback.notificationOccurred('error');
-                }
+                // Режим отладки без Telegram
+                console.log('Telegram Web App не обнаружен, запуск в режиме отладки');
             }
         }
-        
-        // Покупка автокликера
-        function buyAutoclicker(index) {
-            if (!isInitialized) return;
-            
-            const clicker = autoclickers[index];
-            const cost = clicker.baseCost * Math.pow(1.5, clicker.count);
-            
-            if (currency >= cost) {
-                // Вибрация
-                if (tg && tg.HapticFeedback) {
-                    tg.HapticFeedback.impactOccurred('soft');
-                }
-                
-                // Покупка
-                currency -= cost;
-                clicker.count++;
-                
-                // Обновляем доход в секунду
-                incomePerSecond += clicker.income;
-                
-                // Показываем уведомление
-                showBonus('АВТОКЛИКЕР ДОБАВЛЕН!', '#00cec9');
-                
-                // Обновляем интерфейс
+
+        // ==================== СОХРАНЕНИЕ ====================
+        function saveGameState() {
+            localStorage.setItem('silenceGameState', JSON.stringify(gameState));
+            if (tg) {
+                tg.sendData(JSON.stringify(gameState));
+            }
+        }
+
+        function loadGameState() {
+            const saved = localStorage.getItem('silenceGameState');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                gameState = { ...gameState, ...parsed };
                 updateUI();
-                saveGame();
             }
         }
-        
-        // Автоматический доход
-        function autoIncome() {
-            if (!isInitialized) return;
+
+        // ==================== ОСНОВНАЯ МЕХАНИКА ====================
+        function handleClick() {
+            const now = Date.now();
+            if (now - gameState.lastClickTime < 100) return; // Защита от спама
             
-            autoclickers.forEach(clicker => {
-                if (clicker.count > 0) {
-                    const earned = clicker.count * clicker.income;
-                    currency += earned;
-                    xp += earned;
-                    
-                    // Иногда показываем авто-клики
-                    if (Math.random() < 0.1) {
-                        const button = document.getElementById('clickerButton');
-                        const rect = button.getBoundingClientRect();
-                        const x = rect.left + rect.width / 2;
-                        const y = rect.top + rect.height / 2;
-                        
-                        createClickAnimation(x, y, earned, false);
-                    }
-                }
-            });
+            gameState.lastClickTime = now;
             
-            checkLevelUp();
+            // Увеличиваем счетчик кликов
+            gameState.stats.clicks++;
+            
+            // Генерируем награду
+            const rewards = calculateClickRewards();
+            
+            // Добавляем ресурсы
+            for (const [resource, amount] of Object.entries(rewards)) {
+                gameState.resources[resource] += amount;
+            }
+            
+            // Увеличиваем шум (учитывая улучшения)
+            let noiseIncrease = 5;
+            if (gameState.upgrades.includes('soundproofing')) {
+                noiseIncrease = 4;
+            }
+            
+            gameState.noise = Math.min(100, gameState.noise + noiseIncrease);
+            if (gameState.noise > gameState.stats.maxNoise) {
+                gameState.stats.maxNoise = gameState.noise;
+            }
+            
+            // Обновляем UI
             updateUI();
-        }
-        
-        // Проверка повышения уровня
-        function checkLevelUp() {
-            if (xp >= xpToNextLevel) {
-                level++;
-                xp = xp - xpToNextLevel;
-                xpToNextLevel = Math.floor(xpToNextLevel * 1.3);
-                
-                // Бонус за уровень
-                currency += 100 * level;
-                clickPower += level * 0.5;
-                
-                // Вибрация
-                if (tg && tg.HapticFeedback) {
-                    tg.HapticFeedback.notificationOccurred('success');
-                }
-                
-                // Показываем уведомление
-                showBonus(`УРОВЕНЬ ${level}!`, '#ffd700');
-                
-                // Сохраняем
-                saveGame();
+            
+            // Показываем анимацию
+            showClickAnimation(rewards);
+            
+            // Проверяем атаку
+            if (gameState.noise >= 100) {
+                triggerAttack();
             }
-        }
-        
-        // Показ бонусного уведомления
-        function showBonus(text, color) {
-            const bonus = document.createElement('div');
-            bonus.className = 'bonus-notification';
-            bonus.innerHTML = `
-                <i class="fas fa-star"></i>
-                <span>${text}</span>
-            `;
-            bonus.style.background = `linear-gradient(135deg, ${color}, ${color}99)`;
             
-            document.body.appendChild(bonus);
-            
-            setTimeout(() => {
-                if (bonus.parentNode) {
-                    bonus.parentNode.removeChild(bonus);
-                }
-            }, 3000);
+            // Сохраняем состояние
+            saveGameState();
         }
-        
-        // Сохранение игры
-        function saveGame() {
-            const gameData = {
-                currency,
-                clickPower,
-                totalClicks,
-                incomePerSecond,
-                level,
-                xp,
-                xpToNextLevel,
-                upgrades,
-                autoclickers
+
+        function calculateClickRewards() {
+            const baseRewards = {
+                energy: Math.floor(Math.random() * 3) + 1,
+                food: Math.floor(Math.random() * 2) + 1,
+                parts: Math.random() > 0.7 ? 1 : 0,
+                meds: Math.random() > 0.9 ? 1 : 0
             };
             
-            localStorage.setItem('cosmicClickerSave', JSON.stringify(gameData));
-            
-            // Отправляем в Telegram
-            if (tg && tg.sendData) {
-                tg.sendData(JSON.stringify({
-                    action: 'save',
-                    level: level,
-                    currency: currency
-                }));
-            }
-        }
-        
-        // Загрузка игры
-        function loadGame() {
-            const saved = localStorage.getItem('cosmicClickerSave');
-            if (saved) {
-                try {
-                    const gameData = JSON.parse(saved);
-                    
-                    currency = gameData.currency || 0;
-                    clickPower = gameData.clickPower || 1;
-                    totalClicks = gameData.totalClicks || 0;
-                    incomePerSecond = gameData.incomePerSecond || 0;
-                    level = gameData.level || 1;
-                    xp = gameData.xp || 0;
-                    xpToNextLevel = gameData.xpToNextLevel || 100;
-                    
-                    if (gameData.upgrades) {
-                        Object.assign(upgrades, gameData.upgrades);
-                    }
-                    
-                    if (gameData.autoclickers) {
-                        autoclickers.forEach((clicker, index) => {
-                            if (gameData.autoclickers[index]) {
-                                clicker.count = gameData.autoclickers[index].count || 0;
-                                clicker.baseCost = gameData.autoclickers[index].baseCost || clicker.baseCost;
-                                clicker.income = gameData.autoclickers[index].income || clicker.income;
-                            }
-                        });
-                    }
-                    
-                    // Пересчитываем доход в секунду
-                    incomePerSecond = 0;
-                    autoclickers.forEach(clicker => {
-                        incomePerSecond += clicker.count * clicker.income;
-                    });
-                    
-                    showBonus('ИГРА ЗАГРУЖЕНА!', '#00cec9');
-                } catch (e) {
-                    console.error('Ошибка загрузки игры:', e);
+            // Удвоение при наличии улучшения
+            if (gameState.upgrades.includes('quiet_tools')) {
+                for (const key in baseRewards) {
+                    baseRewards[key] *= 2;
                 }
             }
+            
+            // Бонус при высоком шуме (риск/награда)
+            if (gameState.noise > 70) {
+                for (const key in baseRewards) {
+                    baseRewards[key] = Math.floor(baseRewards[key] * 1.5);
+                }
+            }
+            
+            return baseRewards;
         }
-        
-        // Инициализация игры
-        function initGame() {
-            // Создаём звёзды
-            createStars();
+
+        function showClickAnimation(rewards) {
+            const button = document.getElementById('clickButton');
+            const notification = document.getElementById('clickNotification');
+            const rewardText = document.getElementById('clickReward');
             
-            // Загружаем игру
-            loadGame();
+            // Анимация кнопки
+            button.classList.add('shake');
+            setTimeout(() => button.classList.remove('shake'), 500);
             
-            // Вешаем обработчики на основную кнопку
-            const clickerArea = document.getElementById('clickerArea');
-            const clickerButton = document.getElementById('clickerButton');
+            // Показываем награду
+            const rewardStr = Object.entries(rewards)
+                .filter(([_, value]) => value > 0)
+                .map(([key, value]) => {
+                    const icons = { energy: '⚡', food: '🥫', parts: '🔧', meds: '💊' };
+                    return `+${value} ${icons[key]}`;
+                })
+                .join(', ');
             
-            // Обработчики для мобильных устройств
-            clickerArea.addEventListener('touchstart', function(e) {
-                e.preventDefault();
-                handleClick(e);
-            }, { passive: false });
+            rewardText.textContent = rewardStr;
+            notification.style.display = 'block';
             
-            clickerArea.addEventListener('touchend', function(e) {
-                e.preventDefault();
-            }, { passive: false });
-            
-            clickerButton.addEventListener('touchstart', function(e) {
-                e.preventDefault();
-                handleClick(e);
-            }, { passive: false });
-            
-            clickerButton.addEventListener('touchend', function(e) {
-                e.preventDefault();
-            }, { passive: false });
-            
-            // Обработчики для десктопа
-            clickerArea.addEventListener('mousedown', handleClick);
-            clickerButton.addEventListener('mousedown', handleClick);
-            
-            // Предотвращаем контекстное меню на кнопке
-            clickerArea.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                return false;
-            });
-            
-            // Улучшения
-            document.getElementById('upgrade1').addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                buyUpgrade('power');
-            });
-            
-            document.getElementById('upgrade2').addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                buyUpgrade('speed');
-            });
-            
-            document.getElementById('upgrade3').addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                buyUpgrade('critical');
-            });
-            
-            // Автокликеры
-            document.getElementById('autoclickerItem1').addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                buyAutoclicker(0);
-            });
-            
-            document.getElementById('autoclickerItem2').addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                buyAutoclicker(1);
-            });
-            
-            document.getElementById('autoclickerItem3').addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                buyAutoclicker(2);
-            });
-            
-            // Обновляем интерфейс
-            updateUI();
-            
-            // Инициализируем автодоход
-            isInitialized = true;
-            
-            // Скрываем экран загрузки
+            // Скрываем через 2 секунды
             setTimeout(() => {
-                document.getElementById('loading').classList.add('hidden');
-            }, 500);
+                notification.style.display = 'none';
+            }, 2000);
             
-            // Автоматический доход каждую секунду
-            setInterval(autoIncome, 1000);
-            
-            // Автосохранение каждые 30 секунд
-            setInterval(saveGame, 30000);
-            
-            // Первоначальное сохранение
-            saveGame();
+            // Частицы
+            createParticles(button);
         }
-        
-        // Запускаем игру после загрузки страницы
-        document.addEventListener('DOMContentLoaded', initGame);
-        
-        // Отправка данных в Telegram при закрытии
-        window.addEventListener('beforeunload', saveGame);
-        
-        // Предотвращаем масштабирование при двойном тапе
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', function(event) {
-            const now = (new Date()).getTime();
-            if (now - lastTouchEnd <= 300) {
-                event.preventDefault();
+
+        function createParticles(element) {
+            const rect = element.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            for (let i = 0; i < 5; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle float-up';
+                particle.innerHTML = ['⚡', '🥫', '🔧', '💊'][Math.floor(Math.random() * 4)];
+                particle.style.left = centerX + 'px';
+                particle.style.top = centerY + 'px';
+                particle.style.fontSize = Math.random() * 20 + 10 + 'px';
+                
+                document.body.appendChild(particle);
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, 1000);
             }
-            lastTouchEnd = now;
-        }, false);
-        
-        // Предотвращаем скролл при тапе на кнопку
-        document.addEventListener('touchmove', function(e) {
-            if (e.target.closest('.clicker-area') || 
-                e.target.closest('.clicker-button') ||
-                e.target.closest('.upgrade-item') ||
-                e.target.closest('.autoclicker-item')) {
-                e.preventDefault();
+        }
+
+        // ==================== СИСТЕМА ШУМА ====================
+        function updateNoiseDisplay() {
+            const noiseBar = document.getElementById('noiseBar');
+            const noisePercent = document.getElementById('noisePercent');
+            const noiseIcon = document.getElementById('noiseIcon');
+            const noiseWarning = document.getElementById('noiseWarning');
+            const clickButton = document.getElementById('clickButton');
+            
+            // Обновляем проценты
+            noisePercent.textContent = `${Math.round(gameState.noise)}%`;
+            noiseBar.style.width = `${gameState.noise}%`;
+            
+            // Обновляем цвет и иконку
+            if (gameState.noise < 30) {
+                noiseBar.style.background = 'var(--noise-low)';
+                noiseIcon.textContent = '🔇';
+                noiseWarning.textContent = 'Полная тишина. Можно работать.';
+            } else if (gameState.noise < 70) {
+                noiseBar.style.background = 'var(--noise-medium)';
+                noiseIcon.textContent = '🎤';
+                noiseWarning.textContent = 'Слышен легкий шелест. Будьте осторожны.';
+            } else if (gameState.noise < 90) {
+                noiseBar.style.background = 'var(--accent-yellow)';
+                noiseIcon.textContent = '📢';
+                noiseWarning.textContent = 'Громкие звуки! Они могут услышать...';
+                clickButton.classList.add('panic');
+            } else {
+                noiseBar.style.background = 'var(--noise-high)';
+                noiseIcon.textContent = '👹';
+                noiseWarning.textContent = 'СЛЫШАТ! Готовьтесь к атаке!';
+                clickButton.classList.add('panic');
             }
-        }, { passive: false });
+            
+            // Показываем/скрываем предупреждение
+            if (gameState.noise > 30) {
+                noiseWarning.classList.add('show');
+            } else {
+                noiseWarning.classList.remove('show');
+                clickButton.classList.remove('panic');
+            }
+            
+            // Анимация иконки
+            noiseIcon.style.transform = `scale(${1 + gameState.noise / 200})`;
+        }
+
+        // Автоматическое снижение шума
+        function autoNoiseDecay() {
+            if (gameState.noise > 0) {
+                const decay = 2; // 2% в минуту
+                const minutesPassed = 1; // Так как вызывается каждую минуту
+                gameState.noise = Math.max(0, gameState.noise - decay * minutesPassed);
+                updateNoiseDisplay();
+                saveGameState();
+            }
+        }
+
+        // ==================== СИСТЕМА АТАКИ ====================
+        function triggerAttack() {
+            const overlay = document.getElementById('attackOverlay');
+            const resultDiv = document.getElementById('attackResult');
+            
+            gameState.stats.attacks++;
+            
+            // Проверяем улучшение "приманка"
+            let penalty = 0.5; // 50% потерь
+            let resultText = '💀 <b>Вы потеряли 50% ресурсов!</b><br>Существа ворвались в бункер.';
+            
+            if (gameState.upgrades.includes('decoy') && Math.random() > 0.5) {
+                penalty = 0.3; // 30% потерь
+                resultText = '🎭 <b>Приманка сработала!</b><br>Существа ушли, но вы всё равно потеряли 30% ресурсов.';
+            }
+            
+            // Применяем штраф
+            for (const resource in gameState.resources) {
+                gameState.resources[resource] = Math.floor(gameState.resources[resource] * (1 - penalty));
+            }
+            
+            // Переход на следующий день
+            gameState.day++;
+            gameState.noise = 0;
+            gameState.nextDayTime = Date.now() + 24 * 60 * 60 * 1000;
+            
+            // Обновляем результат атаки
+            resultDiv.innerHTML = resultText + `<br>Ресурсы сохранены: ${Math.round((1 - penalty) * 100)}%`;
+            
+            // Показываем оверлей
+            overlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            // Сохраняем состояние
+            saveGameState();
+        }
+
+        function closeAttack() {
+            const overlay = document.getElementById('attackOverlay');
+            overlay.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            updateUI();
+        }
+
+        // ==================== СИСТЕМА УЛУЧШЕНИЙ ====================
+        const upgradesData = {
+            soundproofing: {
+                name: '🔇 Звукоизоляция I',
+                description: 'Снижает шум от кликов на 1%',
+                cost: { parts: 20 },
+                icon: '🔇'
+            },
+            quiet_tools: {
+                name: '🔧 Тихие инструменты',
+                description: 'Дает вдвое больше ресурсов за клик',
+                cost: { parts: 30, energy: 10 },
+                icon: '🔧'
+            },
+            decoy: {
+                name: '🎭 Приманка',
+                description: '50% шанс избежать полной потери ресурсов при атаке',
+                cost: { parts: 50 },
+                icon: '🎭'
+            },
+            night_vision: {
+                name: '🌙 Ночное зрение',
+                description: 'Автопоиск работает в 2 раза быстрее',
+                cost: { energy: 40 },
+                icon: '🌙'
+            },
+            first_aid: {
+                name: '💊 Аптечка',
+                description: '+1 выживший (шум снижается на 1% быстрее)',
+                cost: { meds: 15 },
+                icon: '💊'
+            }
+        };
+
+        function renderUpgrades() {
+            const container = document.getElementById('upgradesTab');
+            container.innerHTML = '<div class="upgrades-grid"></div>';
+            const grid = container.querySelector('.upgrades-grid');
+            
+            for (const [id, data] of Object.entries(upgradesData)) {
+                const owned = gameState.upgrades.includes(id);
+                const canAfford = canBuyUpgrade(id);
+                
+                const card = document.createElement('div');
+                card.className = `upgrade-card ${owned ? 'owned' : ''} ${!owned && !canAfford ? 'locked' : ''}`;
+                
+                card.innerHTML = `
+                    <div class="upgrade-icon">${data.icon}</div>
+                    <div class="upgrade-name">${data.name}</div>
+                    <div class="upgrade-desc">${data.description}</div>
+                    <div class="upgrade-cost">
+                        ${Object.entries(data.cost).map(([res, cost]) => `
+                            <div class="cost-item ${gameState.resources[res] >= cost ? 'affordable' : ''}">
+                                ${getResourceIcon(res)} ${cost}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="upgrade-button" 
+                            onclick="buyUpgrade('${id}')" 
+                            ${owned || !canAfford ? 'disabled' : ''}>
+                        ${owned ? '✅ КУПЛЕНО' : '🛒 КУПИТЬ'}
+                    </button>
+                `;
+                
+                grid.appendChild(card);
+            }
+        }
+
+        function canBuyUpgrade(upgradeId) {
+            const data = upgradesData[upgradeId];
+            if (!data) return false;
+            
+            for (const [resource, cost] of Object.entries(data.cost)) {
+                if (gameState.resources[resource] < cost) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function buyUpgrade(upgradeId) {
+            if (gameState.upgrades.includes(upgradeId)) {
+                showNotification('У вас уже есть это улучшение!', 'warning');
+                return;
+            }
+            
+            const data = upgradesData[upgradeId];
+            if (!data) return;
+            
+            // Проверяем стоимость
+            for (const [resource, cost] of Object.entries(data.cost)) {
+                if (gameState.resources[resource] < cost) {
+                    showNotification(`Не хватает ${resource}!`, 'error');
+                    return;
+                }
+            }
+            
+            // Списание ресурсов
+            for (const [resource, cost] of Object.entries(data.cost)) {
+                gameState.resources[resource] -= cost;
+            }
+            
+            // Добавляем улучшение
+            gameState.upgrades.push(upgradeId);
+            
+            // Особые эффекты
+            if (upgradeId === 'first_aid') {
+                gameState.survivors++;
+            }
+            
+            showNotification(`Улучшение куплено: ${data.name}`, 'success');
+            renderUpgrades();
+            updateUI();
+            saveGameState();
+        }
+
+        // ==================== АВТОПОИСК ====================
+        function toggleAutosearch(type) {
+            gameState.autosearch[type] = !gameState.autosearch[type];
+            updateAutosearchUI();
+            saveGameState();
+            
+            showNotification(
+                `${type === 'robot' ? 'Робот-сборщик' : 'Ночной дозор'} ${gameState.autosearch[type] ? 'включен' : 'выключен'}`,
+                'success'
+            );
+        }
+
+        function updateAutosearchUI() {
+            document.getElementById('robotSwitch').className = 
+                `toggle-switch ${gameState.autosearch.robot ? 'active' : ''}`;
+            document.getElementById('watchSwitch').className = 
+                `toggle-switch ${gameState.autosearch.watch ? 'active' : ''}`;
+        }
+
+        // Симуляция работы автопоиска
+        function simulateAutosearch() {
+            if (gameState.autosearch.robot) {
+                // +2 детали/час, +1% шума/час
+                gameState.resources.parts += 2;
+                gameState.noise = Math.min(100, gameState.noise + 1);
+            }
+            
+            if (gameState.autosearch.watch) {
+                // +3 энергии/час, +0.5% шума/час
+                gameState.resources.energy += 3;
+                gameState.noise = Math.min(100, gameState.noise + 0.5);
+            }
+            
+            if (gameState.autosearch.robot || gameState.autosearch.watch) {
+                updateUI();
+                saveGameState();
+            }
+        }
+
+        // ==================== ИНТЕРФЕЙС ====================
+        function switchTab(tabName) {
+            // Обновляем активные табы
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Активируем выбранный таб
+            document.querySelector(`.tab[onclick*="${tabName}"]`).classList.add('active');
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+            
+            // Если переключились на улучшения - перерендерим
+            if (tabName === 'upgrades') {
+                renderUpgrades();
+            }
+        }
+
+        function updateUI() {
+            // Ресурсы
+            document.getElementById('energy').textContent = gameState.resources.energy;
+            document.getElementById('food').textContent = gameState.resources.food;
+            document.getElementById('parts').textContent = gameState.resources.parts;
+            document.getElementById('meds').textContent = gameState.resources.meds;
+            
+            // Статистика
+            document.getElementById('day').textContent = gameState.day;
+            document.getElementById('survivors').textContent = gameState.survivors;
+            document.getElementById('statClicks').textContent = gameState.stats.clicks;
+            document.getElementById('statAttacks').textContent = gameState.stats.attacks;
+            document.getElementById('statDays').textContent = gameState.day - 1;
+            document.getElementById('statMaxNoise').textContent = `${gameState.stats.maxNoise}%`;
+            
+            // Шум
+            updateNoiseDisplay();
+            
+            // Прогресс дня
+            const timeLeft = gameState.nextDayTime - Date.now();
+            if (timeLeft > 0) {
+                const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                document.getElementById('nextDayTimer').textContent = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                const progress = 100 - (timeLeft / (24 * 60 * 60 * 1000)) * 100;
+                document.getElementById('dayProgressBar').style.width = `${progress}%`;
+            }
+            
+            // Описание клика в зависимости от шума
+            const descriptions = {
+                low: ['Аккуратно открываете ящик...', 'Тихо перебираете припасы...', 'Осторожно сдвигаете мебель...'],
+                medium: ['С легким стуком опрокидываете банку...', 'Громко скрипит половица...', 'Звякают инструменты в сумке...'],
+                high: ['В панике роняете металлический поднос!', 'С грохотом падает стеллаж!', 'Разбивается стеклянная колба!']
+            };
+            
+            let descArray;
+            if (gameState.noise < 30) descArray = descriptions.low;
+            else if (gameState.noise < 70) descArray = descriptions.medium;
+            else descArray = descriptions.high;
+            
+            document.getElementById('clickDescription').textContent = 
+                descArray[Math.floor(Math.random() * descArray.length)];
+        }
+
+        function getResourceIcon(resource) {
+            const icons = {
+                energy: '⚡',
+                food: '🥫',
+                parts: '🔧',
+                meds: '💊'
+            };
+            return icons[resource] || '📦';
+        }
+
+        function showNotification(text, type = 'success') {
+            const notification = document.getElementById('notification');
+            const textElement = document.getElementById('notificationText');
+            
+            textElement.textContent = text;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // ==================== ТАЙМЕРЫ ====================
+        setInterval(autoNoiseDecay, 60000); // Каждую минуту
+        setInterval(simulateAutosearch, 3600000); // Каждый час
+        setInterval(updateUI, 1000); // Обновление таймера каждую секунду
+
+        // ==================== ЗАПУСК ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            initTelegram();
+            
+            // Назначаем обработчик клика
+            document.getElementById('clickButton').addEventListener('click', handleClick);
+            
+            // Первоначальный рендеринг/
+            updateUI();
+            renderUpgrades();
+            updateAutosearchUI();
+            
+            // Стартовое сообщение
+            setTimeout(() => {
+                showNotification('Добро пожаловать в бункер! Кликайте, чтобы искать припасы, но следите за шумом!', 'success');
+            }, 1000);
+        });
     </script>
 </body>
 </html>
